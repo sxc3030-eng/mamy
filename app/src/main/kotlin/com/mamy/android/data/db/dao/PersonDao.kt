@@ -24,6 +24,9 @@ interface PersonDao {
     @Query("SELECT * FROM person WHERE email = :email LIMIT 1")
     suspend fun getByEmail(email: String): PersonEntity?
 
+    @Query("SELECT * FROM person WHERE name = :name COLLATE NOCASE LIMIT 1")
+    suspend fun findByName(name: String): PersonEntity?
+
     @Query("SELECT * FROM person WHERE archived = 0 ORDER BY last_interaction_at DESC")
     suspend fun getActiveOrderedByLastInteraction(): List<PersonEntity>
 
