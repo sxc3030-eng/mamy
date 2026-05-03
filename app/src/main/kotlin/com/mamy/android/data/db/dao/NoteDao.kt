@@ -27,8 +27,11 @@ interface NoteDao {
     suspend fun getNonStructured(): List<NoteEntity>
 
     @Query("DELETE FROM note WHERE id = :id")
-    suspend fun deleteById(id: UUID)
+    suspend fun deleteById(id: UUID): Int
 
     @Query("SELECT * FROM note ORDER BY created_at DESC")
     suspend fun getAll(): List<NoteEntity>
+
+    @Query("SELECT * FROM Note ORDER BY created_at DESC LIMIT 1")
+    suspend fun findLatest(): NoteEntity?
 }

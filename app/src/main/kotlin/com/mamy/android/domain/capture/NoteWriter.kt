@@ -154,7 +154,7 @@ class NoteWriter @Inject constructor(
     }
 
     private suspend fun upsertPerson(name: String, roleHint: String?, now: Instant): UUID {
-        val existing = personDao.findByName(name)
+        val existing = personDao.findByExactName(name)
         if (existing != null) return existing.id
         val id = UUID.randomUUID()
         personDao.insert(PersonEntity(

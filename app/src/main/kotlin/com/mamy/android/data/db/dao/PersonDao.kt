@@ -25,7 +25,7 @@ interface PersonDao {
     suspend fun getByEmail(email: String): PersonEntity?
 
     @Query("SELECT * FROM person WHERE name = :name COLLATE NOCASE LIMIT 1")
-    suspend fun findByName(name: String): PersonEntity?
+    suspend fun findByExactName(name: String): PersonEntity?
 
     @Query("SELECT * FROM person WHERE archived = 0 ORDER BY last_interaction_at DESC")
     suspend fun getActiveOrderedByLastInteraction(): List<PersonEntity>
@@ -38,4 +38,7 @@ interface PersonDao {
 
     @Query("SELECT * FROM person ORDER BY name ASC")
     suspend fun getAll(): List<PersonEntity>
+
+    @Query("SELECT * FROM Person WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%' AND archived = 0 ORDER BY last_interaction_at DESC")
+    suspend fun findByName(query: String): List<PersonEntity>
 }

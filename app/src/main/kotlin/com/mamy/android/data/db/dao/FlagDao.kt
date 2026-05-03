@@ -34,4 +34,13 @@ interface FlagDao {
 
     @Query("SELECT * FROM flag ORDER BY created_at DESC")
     suspend fun getAll(): List<FlagEntity>
+
+    @Query("SELECT * FROM Flag WHERE person_id = :personId AND resolved = 0 ORDER BY created_at DESC")
+    suspend fun findActiveByPerson(personId: UUID): List<FlagEntity>
+
+    @Query("SELECT * FROM Flag WHERE from_note_id = :noteId")
+    suspend fun findByNoteId(noteId: UUID): List<FlagEntity>
+
+    @Query("DELETE FROM Flag WHERE from_note_id = :noteId")
+    suspend fun deleteByNoteId(noteId: UUID): Int
 }

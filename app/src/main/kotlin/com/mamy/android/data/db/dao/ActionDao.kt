@@ -39,4 +39,13 @@ interface ActionDao {
 
     @Query("SELECT * FROM action ORDER BY created_at DESC")
     suspend fun getAll(): List<ActionEntity>
+
+    @Query("SELECT * FROM Action WHERE status = 'open' ORDER BY deadline IS NULL, deadline ASC, created_at DESC")
+    suspend fun findOpen(): List<ActionEntity>
+
+    @Query("SELECT * FROM Action WHERE from_note_id = :noteId")
+    suspend fun findByNoteId(noteId: UUID): List<ActionEntity>
+
+    @Query("DELETE FROM Action WHERE from_note_id = :noteId")
+    suspend fun deleteByNoteId(noteId: UUID): Int
 }
