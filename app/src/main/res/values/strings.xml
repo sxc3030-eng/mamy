@@ -52,4 +52,16 @@
     <string name="action_delete">Delete</string>
     <string name="action_confirm">Confirm</string>
     <string name="action_back">Back</string>
+
+    <!-- Calendar (P5) -->
+    <string name="settings_calendar_section">Calendar</string>
+    <string name="settings_calendar_connect_google">Connect Google Calendar</string>
+    <string name="settings_calendar_disconnect">Disconnect</string>
+    <string name="settings_calendar_status_connected">Connected as %1$s</string>
+    <string name="settings_calendar_status_disconnected">Not connected</string>
+    <string name="settings_calendar_disabled_hint">Briefings will only run on demand. Person matching from events is disabled.</string>
+    <string name="onboarding_unmatched_person_prompt">New person: %1$s. Confirm?</string>
+    <string name="onboarding_unmatched_btn_confirm">Confirm</string>
+    <string name="onboarding_unmatched_btn_edit">Edit</string>
+    <string name="onboarding_unmatched_btn_merge">Merge with…</string>
 </resources>

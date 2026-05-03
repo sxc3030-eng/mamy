@@ -52,4 +52,16 @@
     <string name="action_delete">Supprimer</string>
     <string name="action_confirm">Confirmer</string>
     <string name="action_back">Retour</string>
+
+    <!-- Calendrier (P5) -->
+    <string name="settings_calendar_section">Calendrier</string>
+    <string name="settings_calendar_connect_google">Connecter Google Calendar</string>
+    <string name="settings_calendar_disconnect">Déconnecter</string>
+    <string name="settings_calendar_status_connected">Connecté en tant que %1$s</string>
+    <string name="settings_calendar_status_disconnected">Non connecté</string>
+    <string name="settings_calendar_disabled_hint">Les briefings ne s\'exécuteront que sur demande. La correspondance par calendrier est désactivée.</string>
+    <string name="onboarding_unmatched_person_prompt">Nouvelle personne : %1$s. Tu confirmes ?</string>
+    <string name="onboarding_unmatched_btn_confirm">Confirmer</string>
+    <string name="onboarding_unmatched_btn_edit">Éditer</string>
+    <string name="onboarding_unmatched_btn_merge">Fusionner avec…</string>
 </resources>
