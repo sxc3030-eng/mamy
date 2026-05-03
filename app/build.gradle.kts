@@ -10,6 +10,7 @@ plugins {
 android {
     namespace = "com.mamy.android"
     compileSdk = 35
+    ndkVersion = "26.3.11579264"  // r26d, matches AGP 8.7
 
     defaultConfig {
         applicationId = "com.mamy.android"
@@ -20,6 +21,23 @@ android {
 
         testInstrumentationRunner = "com.mamy.android.MamYTestRunner"
         vectorDrawables { useSupportLibrary = true }
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags += listOf("-std=c++17", "-O3", "-fPIC")
+                arguments += listOf("-DANDROID_STL=c++_static")
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     buildTypes {
@@ -57,6 +75,10 @@ android {
                 "/META-INF/LICENSE-notice.md",
             )
         }
+    }
+
+    androidResources {
+        noCompress += listOf("ppn", "pv", "bin")
     }
 
     sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -102,6 +124,8 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.work.runtime.ktx)
     implementation(libs.androidx.security.crypto)
+
+    implementation(libs.porcupine.android)
 
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)

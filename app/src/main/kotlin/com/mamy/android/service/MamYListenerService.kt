@@ -1,77 +1,124 @@
 package com.mamy.android.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import androidx.core.app.ServiceCompat
-import com.mamy.android.R
+import android.util.Log
+import com.mamy.android.data.wakeword.WakeWordEngine
+import com.mamy.android.data.wakeword.WakeWordSensitivity
+import com.mamy.android.domain.capture.CaptureEvent
+import com.mamy.android.domain.capture.CapturePipeline
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.util.Locale
+import javax.inject.Inject
 
-/**
- * Foreground service that will host wake-word + audio pipeline starting in P2.
- * In P1 this skeleton only:
- *  - declares a notification channel
- *  - posts the permanent notification
- *  - starts in foreground with the microphone foregroundServiceType
- *
- * Audio capture, Porcupine, Whisper are wired in P2.
- */
 @AndroidEntryPoint
 class MamYListenerService : Service() {
 
-    override fun onCreate() {
-        super.onCreate()
-        ensureNotificationChannel()
-    }
+    @Inject lateinit var wakeWord: WakeWordEngine
+    @Inject lateinit var pipeline: CapturePipeline
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForegroundCompat()
-        return START_STICKY
-    }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val captureMutex = Mutex()
+    @Volatile private var captureJob: Job? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun ensureNotificationChannel() {
-        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (nm.getNotificationChannel(CHANNEL_ID) == null) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.service_notif_channel_name),
-                NotificationManager.IMPORTANCE_LOW,
-            ).apply {
-                description = getString(R.string.service_notif_channel_desc)
-                setShowBadge(false)
+    override fun onCreate() {
+        super.onCreate()
+        CaptureNotification.ensureChannel(this)
+        val notif = CaptureNotification.build(this, CaptureEvent.Idle)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                CaptureNotification.NOTIF_ID,
+                notif,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
+            )
+        } else {
+            startForeground(CaptureNotification.NOTIF_ID, notif)
+        }
+        startWakeWord()
+        observeEvents()
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_TRIGGER_CAPTURE) {
+            triggerCaptureNow()
+        }
+        return START_STICKY
+    }
+
+    private fun startWakeWord() {
+        try {
+            wakeWord.start(WakeWordSensitivity.DEFAULT) {
+                triggerCaptureNow()
             }
-            nm.createNotificationChannel(channel)
+        } catch (t: Throwable) {
+            Log.e(TAG, "wake-word start failed", t)
         }
     }
 
-    private fun startForegroundCompat() {
-        val notif: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.service_notif_title))
-            .setContentText(getString(R.string.service_notif_text))
-            .setSmallIcon(R.drawable.ic_mamy_listener)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-
-        val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
-        } else {
-            0
+    private fun triggerCaptureNow() {
+        val existing = captureJob
+        if (existing?.isActive == true) {
+            Log.w(TAG, "trigger ignored — capture already running")
+            return
         }
-        ServiceCompat.startForeground(this, NOTIF_ID, notif, type)
+        captureJob = scope.launch {
+            captureMutex.withLock {
+                // Pause wake-word during capture (mic conflict)
+                wakeWord.stop()
+                try {
+                    val lang = if (Locale.getDefault().language == "fr") "fr" else "en"
+                    pipeline.runOneCapture(lang)
+                } finally {
+                    // Resume wake-word
+                    try {
+                        wakeWord.start(WakeWordSensitivity.DEFAULT) { triggerCaptureNow() }
+                    } catch (t: Throwable) {
+                        Log.e(TAG, "wake-word restart failed", t)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun observeEvents() {
+        scope.launch {
+            pipeline.events.collectLatest { ev ->
+                Log.i(TAG, "event=$ev")
+                val notif = CaptureNotification.build(this@MamYListenerService, ev)
+                startForegroundCompat(notif)
+                if (ev is CaptureEvent.TranscriptReady) {
+                    Log.i(TAG, "TRANSCRIPT: ${ev.text} (intent=${ev.intent}, dur=${ev.durationSec}s)")
+                }
+            }
+        }
+    }
+
+    private fun startForegroundCompat(notif: android.app.Notification) {
+        val mgr = getSystemService(android.app.NotificationManager::class.java)
+        mgr?.notify(CaptureNotification.NOTIF_ID, notif)
+    }
+
+    override fun onDestroy() {
+        scope.coroutineContext[Job]?.cancel()
+        try { wakeWord.release() } catch (_: Throwable) {}
+        super.onDestroy()
     }
 
     companion object {
-        const val CHANNEL_ID = "mamy_listener"
-        const val NOTIF_ID = 6291
+        private const val TAG = "MamYListenerService"
+        const val ACTION_TRIGGER_CAPTURE = "com.mamy.android.action.TRIGGER_CAPTURE"
     }
 }
