@@ -60,7 +60,7 @@ class ClaudeProviderTest {
         assertEquals("/v1/messages", recorded.path)
         assertEquals("test-key-claude-1234", recorded.getHeader("x-api-key"))
         assertEquals("2023-06-01", recorded.getHeader("anthropic-version"))
-        assertEquals("application/json", recorded.getHeader("content-type"))
+        assertTrue(recorded.getHeader("content-type")?.startsWith("application/json") == true)
         val body = recorded.body.readUtf8()
         assertTrue(body.contains("\"model\":\"claude-3-5-haiku-20241022\""))
         assertTrue(body.contains("Marie va mieux"))

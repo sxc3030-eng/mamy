@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import java.time.Clock
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
@@ -24,4 +25,12 @@ object LlmModule {
 
     @Provides
     fun provideLlmCostDao(db: MamYDatabase): LlmCostDao = db.llmCostDao()
+
+    @Provides
+    @Singleton
+    fun provideClock(): Clock = Clock.systemDefaultZone()
+
+    @Provides
+    fun provideTtsMessageBuilder(): com.mamy.android.data.tts.TtsConfirmer.MessageBuilder =
+        com.mamy.android.data.tts.TtsConfirmer.MessageBuilder()
 }

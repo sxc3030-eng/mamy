@@ -15,10 +15,16 @@ class LlmProviderFactoryTest {
     private val openai = mockk<OpenAIProvider>(relaxed = true)
     private val gemini = mockk<GeminiProvider>(relaxed = true)
 
+    init {
+        io.mockk.every { claude.id } returns "claude"
+        io.mockk.every { openai.id } returns "openai"
+        io.mockk.every { gemini.id } returns "gemini"
+    }
+
     private val factory = LlmProviderFactory(
-        claude = lazy { claude.also { io.mockk.every { it.id } returns "claude" } },
-        openai = lazy { openai.also { io.mockk.every { it.id } returns "openai" } },
-        gemini = lazy { gemini.also { io.mockk.every { it.id } returns "gemini" } },
+        claude = dagger.Lazy { claude },
+        openai = dagger.Lazy { openai },
+        gemini = dagger.Lazy { gemini },
     )
 
     @Test

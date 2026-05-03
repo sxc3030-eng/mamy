@@ -3,6 +3,7 @@ package com.mamy.android.data.llm
 import com.mamy.android.data.llm.claude.ClaudeProvider
 import com.mamy.android.data.llm.gemini.GeminiProvider
 import com.mamy.android.data.llm.openai.OpenAIProvider
+import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -13,11 +14,11 @@ class LlmProviderFactory @Inject constructor(
     private val gemini: Lazy<GeminiProvider>,
 ) {
     fun byId(id: String): LlmProvider = when (id) {
-        LlmProviderId.CLAUDE -> claude.value
-        LlmProviderId.OPENAI -> openai.value
-        LlmProviderId.GEMINI -> gemini.value
+        LlmProviderId.CLAUDE -> claude.get()
+        LlmProviderId.OPENAI -> openai.get()
+        LlmProviderId.GEMINI -> gemini.get()
         else -> throw IllegalArgumentException("Unknown LLM provider id: $id")
     }
 
-    fun all(): List<LlmProvider> = listOf(claude.value, openai.value, gemini.value)
+    fun all(): List<LlmProvider> = listOf(claude.get(), openai.get(), gemini.get())
 }

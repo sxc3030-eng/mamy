@@ -6,6 +6,7 @@ import com.mamy.android.data.llm.LlmProviderId
 import com.mamy.android.data.llm.cost.LlmCostCalculator
 import com.mamy.android.data.llm.cost.LlmCostTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.time.YearMonth
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,7 @@ class CostViewModel @Inject constructor(
     calculator: LlmCostCalculator,
 ) : ViewModel() {
 
-    val rows: StateFlow<List<CostRow>> = tracker.monthlyCosts()
+    val rows: StateFlow<List<CostRow>> = tracker.monthlyCosts(YearMonth.now())
         .map { list ->
             list.map { mc ->
                 CostRow(

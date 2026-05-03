@@ -25,12 +25,18 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 @Singleton
-class OpenAIProvider @Inject constructor(
+class OpenAIProvider(
     private val client: OkHttpClient,
     private val vault: SecretsVault,
     private val parser: StructuredNoteParser = StructuredNoteParser(),
     private val baseUrl: String = "https://api.openai.com",
 ) : LlmProvider {
+
+    @Inject constructor(
+        client: OkHttpClient,
+        vault: SecretsVault,
+        parser: StructuredNoteParser,
+    ) : this(client, vault, parser, "https://api.openai.com")
 
     override val id = LlmProviderId.OPENAI
     override val displayName = "OpenAI GPT-4o"

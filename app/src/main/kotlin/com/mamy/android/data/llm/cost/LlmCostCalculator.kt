@@ -7,16 +7,16 @@ import javax.inject.Singleton
 /**
  * Per-provider token pricing. Stored as microcents-per-million-tokens to avoid floats.
  *
- *   1 USD = 100 cents = 100_000_000 microcents
- *   $1.00/M tokens   = 100_000_000 microcents per 1M tokens = 100 microcents per token
+ *   1 USD = 100 cents = 1_000_000 microcents (because 1 cent = 10_000 microcents)
+ *   $1.00/M tokens   = 1_000_000 microcents per 1M tokens = 1 microcent per token
  */
 @Singleton
 class LlmCostCalculator @Inject constructor() {
 
     fun microCents(providerId: String, tokensIn: Int, tokensOut: Int): Long {
         val rates = when (providerId) {
-            LlmProviderId.CLAUDE -> Rates(inMicroPerM = 100_000_000, outMicroPerM = 500_000_000) // $1.00 / $5.00
-            LlmProviderId.OPENAI -> Rates(inMicroPerM = 15_000_000, outMicroPerM = 60_000_000)  // $0.15 / $0.60
+            LlmProviderId.CLAUDE -> Rates(inMicroPerM = 1_000_000, outMicroPerM = 5_000_000) // $1.00 / $5.00
+            LlmProviderId.OPENAI -> Rates(inMicroPerM = 150_000, outMicroPerM = 600_000)     // $0.15 / $0.60
             LlmProviderId.GEMINI -> Rates(inMicroPerM = 0, outMicroPerM = 0)
             else -> Rates(0, 0)
         }

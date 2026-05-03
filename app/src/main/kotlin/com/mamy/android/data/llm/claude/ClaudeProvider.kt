@@ -25,12 +25,18 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 @Singleton
-class ClaudeProvider @Inject constructor(
+class ClaudeProvider(
     private val client: OkHttpClient,
     private val vault: SecretsVault,
     private val parser: StructuredNoteParser = StructuredNoteParser(),
     private val baseUrl: String = "https://api.anthropic.com",
 ) : LlmProvider {
+
+    @Inject constructor(
+        client: OkHttpClient,
+        vault: SecretsVault,
+        parser: StructuredNoteParser,
+    ) : this(client, vault, parser, "https://api.anthropic.com")
 
     override val id = LlmProviderId.CLAUDE
     override val displayName = "Anthropic Claude"
