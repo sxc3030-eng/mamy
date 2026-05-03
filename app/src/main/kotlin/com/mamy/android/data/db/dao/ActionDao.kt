@@ -48,4 +48,12 @@ interface ActionDao {
 
     @Query("DELETE FROM Action WHERE from_note_id = :noteId")
     suspend fun deleteByNoteId(noteId: UUID): Int
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM action WHERE linked_person_id = :personId ORDER BY created_at DESC")
+    suspend fun linkedTo(personId: UUID): List<ActionEntity>
+
+    @Query("SELECT * FROM action WHERE created_at >= :from AND created_at < :to ORDER BY created_at DESC")
+    suspend fun createdBetween(from: Instant, to: Instant): List<ActionEntity>
 }

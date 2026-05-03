@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.mamy.android.data.db.entity.NoteEntity
+import java.time.Instant
 import java.util.UUID
 
 @Dao
@@ -34,4 +35,12 @@ interface NoteDao {
 
     @Query("SELECT * FROM Note ORDER BY created_at DESC LIMIT 1")
     suspend fun findLatest(): NoteEntity?
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM note WHERE person_id = :personId ORDER BY created_at DESC LIMIT :limit")
+    suspend fun lastNForPerson(personId: UUID, limit: Int): List<NoteEntity>
+
+    @Query("SELECT * FROM note WHERE created_at >= :from AND created_at < :to ORDER BY created_at DESC")
+    suspend fun between(from: Instant, to: Instant): List<NoteEntity>
 }

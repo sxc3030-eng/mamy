@@ -51,4 +51,15 @@ interface PromiseDao {
 
     @Query("SELECT * FROM Promise WHERE from_id = :fromId AND to_id = :toId AND status = 'active' ORDER BY created_at DESC")
     suspend fun findActiveBetween(fromId: String, toId: String): List<PromiseEntity>
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM promise WHERE from_id = :fromId AND to_id = :toId AND status = 'active' ORDER BY created_at DESC")
+    suspend fun openFromTo(fromId: String, toId: String): List<PromiseEntity>
+
+    @Query("SELECT * FROM promise WHERE from_id = :fromId AND to_id = :toId ORDER BY created_at DESC")
+    suspend fun allFromTo(fromId: String, toId: String): List<PromiseEntity>
+
+    @Query("SELECT * FROM promise WHERE (created_at >= :from AND created_at < :to) OR (resolved_at >= :from AND resolved_at < :to) ORDER BY created_at DESC")
+    suspend fun updatedBetween(from: Instant, to: Instant): List<PromiseEntity>
 }

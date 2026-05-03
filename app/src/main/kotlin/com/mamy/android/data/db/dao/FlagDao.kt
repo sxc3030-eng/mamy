@@ -43,4 +43,12 @@ interface FlagDao {
 
     @Query("DELETE FROM Flag WHERE from_note_id = :noteId")
     suspend fun deleteByNoteId(noteId: UUID): Int
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM flag WHERE person_id = :personId AND resolved = 0 ORDER BY created_at DESC")
+    suspend fun openForPerson(personId: UUID): List<FlagEntity>
+
+    @Query("SELECT * FROM flag WHERE person_id = :personId ORDER BY created_at DESC")
+    suspend fun allForPerson(personId: UUID): List<FlagEntity>
 }
