@@ -31,5 +31,13 @@ data class IntentResult(
         fun spoken(text: String) = IntentResult(spokenText = text, success = true)
         fun silent() = IntentResult(spokenText = null, success = true)
         fun failure(error: String) = IntentResult(spokenText = null, success = false, error = error)
+
+        /**
+         * P6 alias matching the briefing-plan signature : `IntentResult.Ok(spokenText = "...")`.
+         * Equivalent to [spoken] — kept so briefing handler code reads as the plan
+         * specifies. Note this is a **factory function**, not a sealed-class subtype:
+         * casting `(result as IntentResult.Ok)` is NOT supported (use `result.spokenText`).
+         */
+        fun Ok(spokenText: String): IntentResult = spoken(spokenText)
     }
 }

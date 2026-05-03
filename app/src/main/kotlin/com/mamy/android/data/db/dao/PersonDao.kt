@@ -50,4 +50,12 @@ interface PersonDao {
 
     @Query("SELECT * FROM Person WHERE LOWER(name) LIKE '%' || LOWER(:query) || '%' AND archived = 0 ORDER BY last_interaction_at DESC")
     suspend fun findByName(query: String): List<PersonEntity>
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM person WHERE id = :id LIMIT 1")
+    suspend fun byId(id: UUID): PersonEntity?
+
+    @Query("SELECT * FROM person WHERE archived = 0 ORDER BY last_interaction_at DESC")
+    suspend fun allActive(): List<PersonEntity>
 }

@@ -64,4 +64,12 @@
     <string name="onboarding_unmatched_btn_confirm">Confirm</string>
     <string name="onboarding_unmatched_btn_edit">Edit</string>
     <string name="onboarding_unmatched_btn_merge">Merge with…</string>
+
+    <!-- P6 Briefing notifications -->
+    <string name="notif_channel_daily">Daily briefing</string>
+    <string name="notif_channel_pre_meeting">Pre-meeting briefing</string>
+    <string name="notif_daily_title">Briefing ready</string>
+    <string name="notif_daily_body">Say \"MamY my day\" to listen.</string>
+    <string name="notif_pre_title">5 min before {title}</string>
+    <string name="notif_pre_body">Tap to listen, or say \"MamY brief me\".</string>
 </resources>

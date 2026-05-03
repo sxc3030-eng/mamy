@@ -24,4 +24,12 @@ interface BriefingDao {
 
     @Query("SELECT COUNT(*) FROM briefing")
     suspend fun countAll(): Int
+
+    // ----- P6 Briefing cache (plan-spec names) -----
+
+    @Query("SELECT * FROM briefing WHERE type = :type AND target_id = :targetId AND expires_at > :now ORDER BY generated_at DESC LIMIT 1")
+    suspend fun fresh(type: String, targetId: String, now: Instant): BriefingEntity?
+
+    @Query("DELETE FROM briefing WHERE type = :type AND target_id = :targetId")
+    suspend fun deleteFor(type: String, targetId: String)
 }

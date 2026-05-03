@@ -42,4 +42,15 @@ interface MeetingDao {
 
     @Query("DELETE FROM meeting WHERE id = :id")
     suspend fun deleteById(id: UUID)
+
+    // ----- P6 Briefing aliases (plan-spec names) -----
+
+    @Query("SELECT * FROM meeting WHERE starts_at >= :from AND starts_at < :to ORDER BY starts_at ASC")
+    suspend fun between(from: Instant, to: Instant): List<MeetingEntity>
+
+    @Query("SELECT * FROM meeting WHERE id = :id LIMIT 1")
+    suspend fun byId(id: UUID): MeetingEntity?
+
+    @Query("SELECT person_id FROM meeting_attendee WHERE meeting_id = :meetingId")
+    suspend fun attendeesOf(meetingId: UUID): List<UUID>
 }
