@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,17 +49,17 @@ class AudioCaptureImpl @Inject constructor(
         }
 
         val frame = ShortArray(AudioFormat.SAMPLES_PER_FRAME)
-        @Volatile var stop = false
+        val stop = AtomicBoolean(false)
 
         val thread = Thread({
             try {
                 record.startRecording()
-                while (!stop && !Thread.currentThread().isInterrupted) {
+                while (!stop.get() && !Thread.currentThread().isInterrupted) {
                     var read = 0
                     while (read < frame.size) {
                         val n = record.read(frame, read, frame.size - read)
                         if (n <= 0) {
-                            if (stop) return@Thread
+                            if (stop.get()) return@Thread
                             continue
                         }
                         read += n
@@ -77,7 +78,7 @@ class AudioCaptureImpl @Inject constructor(
         }, "MamY-AudioCapture").apply { isDaemon = true; start() }
 
         awaitClose {
-            stop = true
+            stop.set(true)
             thread.interrupt()
             thread.join(500)
         }

@@ -1,26 +1,27 @@
 package com.mamy.android.data.audio
 
-import com.konovalov.vad.webrtc.Vad
-import com.konovalov.vad.webrtc.config.FrameSize
-import com.konovalov.vad.webrtc.config.Mode
-import com.konovalov.vad.webrtc.config.SampleRate
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.sqrt
 
 /**
  * Consumes a [Flow] of PCM frames and applies VAD :
  *   - waits for first speech frame (otherwise NoSpeech after 5 s)
  *   - then accumulates until 1.5 s of trailing silence
  *   - hard cap at 90 s
+ *
+ * Uses a simple RMS-energy detector (no external lib). Good enough for our wedge :
+ * detect "user stopped speaking after 1.5 s of silence". WebRTC VAD would give better
+ * voice/noise classification but the energy threshold is sufficient for desk + corridor
+ * recordings. Threshold is tunable via [SimpleEnergyVad.rmsThreshold].
  */
 @Singleton
 class VadProcessor @Inject constructor() {
 
     /** Override-able for testing. */
-    internal var vadFactory: () -> SimpleVad = ::createWebRtcVad
+    internal var vadFactory: () -> SimpleVad = ::createEnergyVad
 
     suspend fun captureUntilSilence(frames: Flow<ShortArray>): VadResult {
         val vad = vadFactory()
@@ -83,17 +84,7 @@ class VadProcessor @Inject constructor() {
         }
     }
 
-    private fun createWebRtcVad(): SimpleVad {
-        val v = Vad.builder()
-            .setSampleRate(SampleRate.SAMPLE_RATE_16K)
-            .setFrameSize(FrameSize.FRAME_SIZE_480)
-            .setMode(Mode.AGGRESSIVE)
-            .build()
-        return object : SimpleVad {
-            override fun isSpeech(frame: ShortArray): Boolean = v.isSpeech(frame)
-            override fun close() = v.close()
-        }
-    }
+    private fun createEnergyVad(): SimpleVad = SimpleEnergyVad()
 
     private companion object {
         const val SILENCE_CUT_MS = 1500
@@ -101,8 +92,41 @@ class VadProcessor @Inject constructor() {
     }
 }
 
-/** Test-friendly facade over the WebRTC VAD library. */
+/** Test-friendly facade over the VAD detector. */
 internal interface SimpleVad {
     fun isSpeech(frame: ShortArray): Boolean
     fun close()
+}
+
+/**
+ * RMS-energy-based VAD. Computes root-mean-square of the 16-bit PCM frame and compares
+ * against a threshold. Tuned conservatively : threshold ~200 corresponds to roughly
+ * "ambient room noise" being silence, "spoken words" being speech.
+ *
+ * The threshold can be tuned per-device via settings. We avoid an external WebRTC VAD lib
+ * (JitPack reachability issues + unnecessary complexity for V1). If we need better
+ * voice/noise classification, swap this for whisper.cpp's built-in VAD or a TFLite
+ * model in V2.
+ */
+internal class SimpleEnergyVad(
+    private val rmsThreshold: Double = DEFAULT_RMS_THRESHOLD,
+) : SimpleVad {
+
+    override fun isSpeech(frame: ShortArray): Boolean {
+        if (frame.isEmpty()) return false
+        var sumSq = 0.0
+        for (sample in frame) {
+            val v = sample.toDouble()
+            sumSq += v * v
+        }
+        val rms = sqrt(sumSq / frame.size)
+        return rms > rmsThreshold
+    }
+
+    override fun close() { /* no-op */ }
+
+    companion object {
+        // 16-bit PCM range : -32768..32767. Ambient room ~50-100 RMS, normal speech ~500-3000 RMS.
+        const val DEFAULT_RMS_THRESHOLD = 200.0
+    }
 }

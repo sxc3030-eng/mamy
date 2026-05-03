@@ -108,7 +108,6 @@ dependencies {
     implementation(libs.androidx.security.crypto)
 
     implementation(libs.porcupine.android)
-    implementation(libs.webrtc.vad)
 
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
