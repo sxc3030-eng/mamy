@@ -4,7 +4,7 @@ import com.mamy.android.data.llm.LlmProvider
 import com.mamy.android.data.llm.LlmProviderId
 import com.mamy.android.data.llm.LlmRequest
 import com.mamy.android.data.llm.LlmResponse
-import com.mamy.android.data.llm.ParseFailedException
+import com.mamy.android.data.llm.claude.ParseFailedException
 import com.mamy.android.data.llm.StructuredNoteParser
 import com.mamy.android.data.secrets.SecretsVault
 import javax.inject.Inject
