@@ -6,10 +6,6 @@ import com.mamy.android.domain.intent.handler.DailyBriefHandler
 import com.mamy.android.domain.intent.handler.EodSummaryHandler
 import com.mamy.android.domain.intent.handler.NextBriefHandler
 import com.mamy.android.domain.intent.handler.PersonBriefHandler
-import com.mamy.android.domain.intent.handler.StubDailyBriefHandler
-import com.mamy.android.domain.intent.handler.StubEodSummaryHandler
-import com.mamy.android.domain.intent.handler.StubNextBriefHandler
-import com.mamy.android.domain.intent.handler.TemplatedPersonBriefHandler
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -29,19 +25,19 @@ abstract class IntentModule {
 
     @Binds
     @Singleton
-    abstract fun bindDailyBriefHandler(impl: StubDailyBriefHandler): DailyBriefHandler
+    abstract fun bindDailyBriefHandler(impl: com.mamy.android.domain.briefing.DailyBriefHandler): DailyBriefHandler
 
     @Binds
     @Singleton
-    abstract fun bindNextBriefHandler(impl: StubNextBriefHandler): NextBriefHandler
+    abstract fun bindNextBriefHandler(impl: com.mamy.android.domain.briefing.PreMeetingBriefHandler): NextBriefHandler
 
     @Binds
     @Singleton
-    abstract fun bindEodSummaryHandler(impl: StubEodSummaryHandler): EodSummaryHandler
+    abstract fun bindEodSummaryHandler(impl: com.mamy.android.domain.briefing.EodSummaryHandler): EodSummaryHandler
 
     @Binds
     @Singleton
-    abstract fun bindPersonBriefHandler(impl: TemplatedPersonBriefHandler): PersonBriefHandler
+    abstract fun bindPersonBriefHandler(impl: com.mamy.android.domain.briefing.PersonQueryBriefHandler): PersonBriefHandler
 
     @Binds
     @Singleton

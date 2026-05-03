@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.time.ZoneId
 import javax.inject.Singleton
 
 /**
@@ -33,4 +34,7 @@ object BriefingModule {
         val selected = settings.selectedLlmProviderFlow.first()
         factory.byId(selected.name.lowercase())
     }
+
+    @Provides
+    fun provideZoneId(): ZoneId = ZoneId.systemDefault()
 }
