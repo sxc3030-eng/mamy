@@ -1,35 +1,30 @@
 package com.mamy.android.di
 
 import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
+/**
+ * Smoke test : the three DI modules are annotated with @Module (RUNTIME retention).
+ *
+ * NOTE: @InstallIn has CLASS retention (not RUNTIME), so cannot be reflected at unit-test
+ * time. The full Hilt graph wire-up is verified later by @HiltAndroidTest instrumented
+ * tests in P2 (require emulator).
+ */
 class DiModulesTest {
 
     @Test
-    fun `DatabaseModule is annotated @Module @InstallIn(SingletonComponent)`() {
+    fun `DatabaseModule is annotated @Module`() {
         assertNotNull(DatabaseModule::class.java.getAnnotation(Module::class.java))
-        val install = DatabaseModule::class.java.getAnnotation(InstallIn::class.java)
-        assertNotNull(install)
-        assertEquals(SingletonComponent::class.java, install!!.value[0].java)
     }
 
     @Test
-    fun `SecretsModule is annotated @Module @InstallIn(SingletonComponent)`() {
+    fun `SecretsModule is annotated @Module`() {
         assertNotNull(SecretsModule::class.java.getAnnotation(Module::class.java))
-        val install = SecretsModule::class.java.getAnnotation(InstallIn::class.java)
-        assertNotNull(install)
-        assertEquals(SingletonComponent::class.java, install!!.value[0].java)
     }
 
     @Test
-    fun `SettingsModule is annotated @Module @InstallIn(SingletonComponent)`() {
+    fun `SettingsModule is annotated @Module`() {
         assertNotNull(SettingsModule::class.java.getAnnotation(Module::class.java))
-        val install = SettingsModule::class.java.getAnnotation(InstallIn::class.java)
-        assertNotNull(install)
-        assertEquals(SingletonComponent::class.java, install!!.value[0].java)
     }
 }
