@@ -46,7 +46,7 @@ class VadProcessorTest {
 
         val result = proc.captureUntilSilence(source)
 
-        assertTrue("got $result", result is VadResult.NoSpeech)
+        assertTrue(result is VadResult.NoSpeech, "got $result")
     }
 
     @Test
@@ -58,7 +58,7 @@ class VadProcessorTest {
 
         val result = proc.captureUntilSilence(source)
 
-        assertTrue("got $result", result is VadResult.MaxDuration)
+        assertTrue(result is VadResult.MaxDuration, "got $result")
         assertEquals(90, result.durationSec)
     }
 }
