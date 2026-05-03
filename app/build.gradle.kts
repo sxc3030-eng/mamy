@@ -113,6 +113,7 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.accompanist.permissions)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
