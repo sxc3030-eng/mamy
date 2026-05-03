@@ -10,6 +10,8 @@ import com.mamy.android.data.wakeword.WakeWordEngine
 import com.mamy.android.data.wakeword.WakeWordSensitivity
 import com.mamy.android.domain.capture.CaptureEvent
 import com.mamy.android.domain.capture.CapturePipeline
+import com.mamy.android.domain.capture.StructuredCapturePipeline
+import com.mamy.android.util.Lang
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,7 @@ class MamYListenerService : Service() {
 
     @Inject lateinit var wakeWord: WakeWordEngine
     @Inject lateinit var pipeline: CapturePipeline
+    @Inject lateinit var structurer: StructuredCapturePipeline
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val captureMutex = Mutex()
@@ -101,6 +104,9 @@ class MamYListenerService : Service() {
                 startForegroundCompat(notif)
                 if (ev is CaptureEvent.TranscriptReady) {
                     Log.i(TAG, "TRANSCRIPT: ${ev.text} (intent=${ev.intent}, dur=${ev.durationSec}s)")
+                    val lang = if (Locale.getDefault().language == "fr") Lang.FR else Lang.EN
+                    runCatching { structurer.handle(ev.text, lang, ev.durationSec) }
+                        .onFailure { Log.e(TAG, "structurer.handle failed", it) }
                 }
             }
         }
