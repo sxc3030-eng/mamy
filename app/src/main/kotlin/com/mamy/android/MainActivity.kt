@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import com.mamy.android.service.MamYListenerService
 import com.mamy.android.ui.nav.MamYNav
 import com.mamy.android.ui.theme.MamYTheme
+import com.mamy.android.util.PermissionLauncher
 import com.mamy.android.util.VolumeLongPressDetector
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,10 +24,20 @@ class MainActivity : ComponentActivity() {
 
     private val volDetector = VolumeLongPressDetector(onLongPress = ::triggerCapture)
 
+    private val permLauncher = PermissionLauncher.register(this) { granted ->
+        if (granted) startService(Intent(this, MamYListenerService::class.java))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent { MamYApp() }
+        val missing = PermissionLauncher.missing(this)
+        if (missing.isEmpty()) {
+            startService(Intent(this, MamYListenerService::class.java))
+        } else {
+            permLauncher.launch(missing.toTypedArray())
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
