@@ -11,7 +11,6 @@ import com.mamy.android.data.db.dao.MeetingDao
 import com.mamy.android.data.db.dao.NoteDao
 import com.mamy.android.data.db.dao.PersonDao
 import com.mamy.android.data.db.dao.PromiseDao
-import com.mamy.android.data.llm.cost.LlmCostDao
 import com.mamy.android.data.secrets.SecretsVault
 import dagger.Module
 import dagger.Provides
@@ -48,5 +47,4 @@ object DatabaseModule {
     @Provides fun provideMeetingDao(db: MamYDatabase): MeetingDao = db.meetingDao()
     @Provides fun provideMeetingAttendeeDao(db: MamYDatabase): MeetingAttendeeDao = db.meetingAttendeeDao()
     @Provides fun provideBriefingDao(db: MamYDatabase): BriefingDao = db.briefingDao()
-    @Provides fun provideLlmCostDao(db: MamYDatabase): LlmCostDao = db.llmCostDao()
 }
