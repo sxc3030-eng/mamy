@@ -21,6 +21,14 @@
     <string name="service_notif_title">MamY is listening</string>
     <string name="service_notif_text">Say \"MamY\" to capture or query.</string>
 
+    <!-- Capture pipeline notification (P2) -->
+    <string name="mamy_listener_channel_name">MamY listener</string>
+    <string name="mamy_listener_channel_desc">Always-on wake-word listener</string>
+    <string name="notif_title">MamY</string>
+    <string name="notif_idle">Listening for \"MamY\"</string>
+    <string name="notif_recording">Recording…</string>
+    <string name="notif_transcribing">Transcribing…</string>
+
     <!-- Settings -->
     <string name="settings_section_general">General</string>
     <string name="settings_section_byok">API keys (BYOK)</string>

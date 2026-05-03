@@ -21,6 +21,14 @@
     <string name="service_notif_title">MamY écoute</string>
     <string name="service_notif_text">Dis « MamY » pour capturer ou poser une question.</string>
 
+    <!-- Notification pipeline de capture (P2) -->
+    <string name="mamy_listener_channel_name">Écoute MamY</string>
+    <string name="mamy_listener_channel_desc">Écoute en continu du mot-clé</string>
+    <string name="notif_title">MamY</string>
+    <string name="notif_idle">À l\'écoute de « MamY »</string>
+    <string name="notif_recording">Enregistrement…</string>
+    <string name="notif_transcribing">Transcription…</string>
+
     <!-- Réglages -->
     <string name="settings_section_general">Général</string>
     <string name="settings_section_byok">Clés API (BYOK)</string>

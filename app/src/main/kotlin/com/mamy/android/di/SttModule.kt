@@ -3,6 +3,7 @@ package com.mamy.android.di
 import android.content.Context
 import com.mamy.android.data.stt.WhisperEngine
 import com.mamy.android.data.stt.WhisperEngineImpl
+import com.mamy.android.data.stt.WhisperModel
 import com.mamy.android.data.stt.WhisperModelDownloader
 import com.mamy.android.data.stt.jni.WhisperJni
 import dagger.Module
@@ -19,6 +20,9 @@ object SttModule {
 
     @Provides @Singleton
     fun provideWhisperJni(): WhisperJni = WhisperJni()
+
+    @Provides @Singleton
+    fun provideWhisperModel(): WhisperModel = WhisperModel.TINY
 
     @Provides @Singleton
     fun provideDownloader(@ApplicationContext ctx: Context): WhisperModelDownloader =
