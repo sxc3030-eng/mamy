@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 /**
@@ -38,6 +39,25 @@ class SettingsRepository(
 
     val wakeWordSensitivityFlow: Flow<Int> = dataStore.data.map { prefs ->
         prefs[KEY_WAKEWORD_SENSITIVITY] ?: DEFAULT_WAKEWORD_SENSITIVITY
+    }
+
+    /**
+     * Combined snapshot used by the LLM/structurer layer (P3+). Returns lowercase
+     * strings rather than typed enums so call-sites that compare against
+     * [com.mamy.android.data.llm.LlmProviderId] constants stay simple.
+     */
+    fun stream(): Flow<Settings> = combine(
+        selectedLlmProviderFlow,
+        languageFlow,
+    ) { provider, lang ->
+        Settings(
+            llmProvider = provider.name.lowercase(),
+            uiLanguage = when (lang) {
+                Language.FR -> "fr"
+                Language.EN -> "en"
+                Language.SYSTEM -> "en"
+            },
+        )
     }
 
     suspend fun setLanguage(value: Language) {
