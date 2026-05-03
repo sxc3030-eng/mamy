@@ -24,4 +24,10 @@ interface MeetingAttendeeDao {
 
     @Query("DELETE FROM meeting_attendee WHERE meeting_id = :meetingId")
     suspend fun deleteAllForMeeting(meetingId: UUID)
+
+    @Query("DELETE FROM meeting_attendee WHERE meeting_id = :meetingId")
+    suspend fun deleteForMeeting(meetingId: UUID)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(rows: List<MeetingAttendeeEntity>)
 }

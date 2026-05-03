@@ -25,6 +25,15 @@ interface MeetingDao {
     @Query("SELECT * FROM meeting WHERE calendar_event_id = :eventId LIMIT 1")
     suspend fun getByCalendarEventId(eventId: String): MeetingEntity?
 
+    @Query("SELECT * FROM meeting WHERE calendar_event_id = :evtId LIMIT 1")
+    suspend fun findByCalendarEventId(evtId: String): MeetingEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(meeting: MeetingEntity)
+
+    @Query("DELETE FROM meeting WHERE calendar_event_id = :evtId")
+    suspend fun deleteByCalendarEventId(evtId: String)
+
     @Query("SELECT * FROM meeting WHERE starts_at BETWEEN :from AND :to ORDER BY starts_at ASC")
     suspend fun getInRange(from: Instant, to: Instant): List<MeetingEntity>
 
