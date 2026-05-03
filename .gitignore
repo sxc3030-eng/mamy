@@ -1,0 +1,52 @@
+# Android / Gradle
+*.iml
+.gradle/
+build/
+local.properties
+.idea/
+captures/
+*.apk
+*.aab
+*.ap_
+*.dex
+.cxx/
+output.json
+
+# Kotlin
+.kotlin/
+
+# IDE
+.vscode/
+*.swp
+*~
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets / keys (NEVER commit)
+*.keystore
+*.jks
+google-services.json
+GoogleService-Info.plist
+api-keys/
+.env
+.env.*
+secrets.properties
+
+# Models (téléchargés à l'install)
+models/
+*.gguf
+*.bin
+*.onnx
+
+# Logs / cache
+*.log
+logs/
+.cache/
+
+# Test / coverage
+.test-results/
+coverage/
