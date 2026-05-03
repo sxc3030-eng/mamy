@@ -2,8 +2,10 @@ package com.mamy.android.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -64,5 +66,21 @@ fun LlmSettingsScreen(vm: LlmSettingsViewModel = hiltViewModel()) {
             is KeyTestResult.Success -> "Key OK for ${r.providerId}"
             is KeyTestResult.Failure -> "Key test failed: ${r.message}"
         })
+
+        MonthlyCostsSection()
+    }
+}
+
+@Composable
+fun MonthlyCostsSection(vm: CostViewModel = hiltViewModel()) {
+    val rows by vm.rows.collectAsState()
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text("Coût ce mois", style = MaterialTheme.typography.titleMedium)
+        rows.forEach { r ->
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(r.displayName)
+                Text(r.costDisplay)
+            }
+        }
     }
 }
