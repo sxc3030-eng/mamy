@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.mamy.android.data.settings.CalendarSettings
 import com.mamy.android.data.settings.SettingsRepository
 import dagger.Module
 import dagger.Provides
@@ -27,4 +28,9 @@ object SettingsModule {
     @Singleton
     fun provideSettingsRepository(dataStore: DataStore<Preferences>): SettingsRepository =
         SettingsRepository(dataStore)
+
+    @Provides
+    @Singleton
+    fun provideCalendarSettings(dataStore: DataStore<Preferences>): CalendarSettings =
+        CalendarSettings(dataStore)
 }

@@ -4,12 +4,18 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.mamy.android.data.calendar.google.CalendarApiClient
+import com.mamy.android.data.calendar.google.CalendarAuthManager
+import com.mamy.android.data.calendar.google.CalendarHttpLogger
+import com.mamy.android.data.calendar.google.CalendarTokenStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -36,4 +42,36 @@ object CalendarModule {
         ignoreUnknownKeys = true
         explicitNulls = false
     }
+
+    @Provides @Singleton @Named("calendar_http_raw")
+    fun provideRawCalendarHttp(logger: CalendarHttpLogger): OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(logger)
+        .build()
+
+    @Provides @Singleton
+    fun provideCalendarAuthManager(
+        @ApplicationContext context: Context,
+        tokenStore: CalendarTokenStore,
+        @Named("calendar_http_raw") httpClient: OkHttpClient
+    ): CalendarAuthManager {
+        val resId = context.resources.getIdentifier(
+            "google_oauth_web_client_id", "string", context.packageName
+        )
+        val webClientId = if (resId != 0) context.getString(resId) else ""
+        return CalendarAuthManager(
+            context = context,
+            tokenStore = tokenStore,
+            httpClient = httpClient,
+            webClientId = webClientId
+        )
+    }
+
+    @Provides @Singleton
+    fun provideCalendarApiClient(
+        @Named("calendar_http_raw") httpClient: OkHttpClient,
+        authManager: CalendarAuthManager,
+        json: Json
+    ): CalendarApiClient = CalendarApiClient(httpClient, authManager, json)
 }
