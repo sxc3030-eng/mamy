@@ -64,4 +64,12 @@
     <string name="onboarding_unmatched_btn_confirm">Confirmer</string>
     <string name="onboarding_unmatched_btn_edit">Éditer</string>
     <string name="onboarding_unmatched_btn_merge">Fusionner avec…</string>
+
+    <!-- P6 Briefing notifications -->
+    <string name="notif_channel_daily">Briefing matinal</string>
+    <string name="notif_channel_pre_meeting">Briefing pré-meeting</string>
+    <string name="notif_daily_title">Briefing prêt</string>
+    <string name="notif_daily_body">Dis « MamY ma journée » pour l\'écouter.</string>
+    <string name="notif_pre_title">5 min avant {title}</string>
+    <string name="notif_pre_body">Touche pour écouter, ou dis « MamY briefe ».</string>
 </resources>
