@@ -31,6 +31,7 @@ androidx-test-runner = "1.6.2"
 espresso = "3.6.1"
 compose-test = "1.7.5"
 porcupine = "3.0.2"
+webrtc-vad = "0.0.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -88,6 +89,7 @@ compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 
 porcupine-android = { module = "ai.picovoice:porcupine-android", version.ref = "porcupine" }
+webrtc-vad = { module = "com.github.yuriy-budiyev:webrtc-vad-android", version.ref = "webrtc-vad" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
