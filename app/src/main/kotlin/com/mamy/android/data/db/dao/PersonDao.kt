@@ -35,4 +35,7 @@ interface PersonDao {
 
     @Query("DELETE FROM person WHERE id = :id")
     suspend fun deleteById(id: UUID)
+
+    @Query("SELECT * FROM person ORDER BY name ASC")
+    suspend fun getAll(): List<PersonEntity>
 }

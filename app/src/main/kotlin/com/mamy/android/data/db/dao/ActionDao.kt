@@ -36,4 +36,7 @@ interface ActionDao {
 
     @Query("DELETE FROM action WHERE id = :id")
     suspend fun deleteById(id: UUID)
+
+    @Query("SELECT * FROM action ORDER BY created_at DESC")
+    suspend fun getAll(): List<ActionEntity>
 }
