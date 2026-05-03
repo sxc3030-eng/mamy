@@ -59,6 +59,10 @@ android {
         }
     }
 
+    androidResources {
+        noCompress += listOf("ppn", "pv", "bin")
+    }
+
     sourceSets["main"].java.srcDirs("src/main/kotlin")
     sourceSets["test"].java.srcDirs("src/test/kotlin")
     sourceSets["androidTest"].java.srcDirs("src/androidTest/kotlin")
@@ -102,6 +106,8 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.work.runtime.ktx)
     implementation(libs.androidx.security.crypto)
+
+    implementation(libs.porcupine.android)
 
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
