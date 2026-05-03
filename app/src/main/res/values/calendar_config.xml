@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TODO before public release: replace with real OAuth client ID from Google Cloud Console -->
+    <!-- Type: Android (with SHA-1 fingerprint of signing key) and Web (for server tokens) -->
+    <!-- During development, use a debug client tied to the debug keystore SHA-1 -->
+    <string name="google_oauth_web_client_id" translatable="false">REPLACE_ME.apps.googleusercontent.com</string>
+    <string name="google_calendar_scope" translatable="false">https://www.googleapis.com/auth/calendar.readonly</string>
+</resources>

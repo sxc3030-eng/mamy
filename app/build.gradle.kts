@@ -131,7 +131,16 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
 
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.google.id)
+    implementation(libs.play.services.auth)
+
+    implementation(libs.hilt.work)
+    kapt(libs.hilt.compiler.androidx)
+
     testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.work.testing)
 
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
