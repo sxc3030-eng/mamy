@@ -31,4 +31,7 @@ interface FlagDao {
 
     @Query("DELETE FROM flag WHERE id = :id")
     suspend fun deleteById(id: UUID)
+
+    @Query("SELECT * FROM flag ORDER BY created_at DESC")
+    suspend fun getAll(): List<FlagEntity>
 }
