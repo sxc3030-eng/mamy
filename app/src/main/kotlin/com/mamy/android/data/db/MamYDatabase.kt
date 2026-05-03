@@ -20,6 +20,8 @@ import com.mamy.android.data.db.entity.MeetingEntity
 import com.mamy.android.data.db.entity.NoteEntity
 import com.mamy.android.data.db.entity.PersonEntity
 import com.mamy.android.data.db.entity.PromiseEntity
+import com.mamy.android.data.llm.cost.LlmCostDao
+import com.mamy.android.data.llm.cost.LlmCostEntry
 
 @Database(
     entities = [
@@ -31,8 +33,9 @@ import com.mamy.android.data.db.entity.PromiseEntity
         MeetingEntity::class,
         MeetingAttendeeEntity::class,
         BriefingEntity::class,
+        LlmCostEntry::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -46,6 +49,7 @@ abstract class MamYDatabase : RoomDatabase() {
     abstract fun meetingDao(): MeetingDao
     abstract fun meetingAttendeeDao(): MeetingAttendeeDao
     abstract fun briefingDao(): BriefingDao
+    abstract fun llmCostDao(): LlmCostDao
 
     companion object {
         const val DB_NAME = "mamy.db"
