@@ -43,7 +43,7 @@ class StructuredCapturePipelineTest {
 
     @Test
     fun `non-Capture intent skips structurer`() = runTest {
-        coEvery { router.route("MamY ma journée") } returns Intent.DailyBrief
+        coEvery { router.route("MamY ma journée") } returns Intent.DailyBrief("MamY ma journée")
 
         pipeline.handle("MamY ma journée", Lang.FR, 5)
 
