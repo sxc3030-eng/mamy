@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MamY</string>
+
+    <!-- Screens -->
+    <string name="screen_onboarding_title">Welcome to MamY</string>
+    <string name="screen_reports_title">Your team</string>
+    <string name="screen_person_detail_title">Person</string>
+    <string name="screen_actions_title">Open actions</string>
+    <string name="screen_settings_title">Settings</string>
+    <string name="screen_network_log_title">Network log</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_btn_continue">Continue</string>
+    <string name="onboarding_intro_title">Voice-first secretary</string>
+    <string name="onboarding_intro_body">Walk, talk, and let MamY structure your 1:1 debriefs.</string>
+
+    <!-- Foreground service notification -->
+    <string name="service_notif_channel_name">MamY listener</string>
+    <string name="service_notif_channel_desc">Permanent notification while wake-word is active.</string>
+    <string name="service_notif_title">MamY is listening</string>
+    <string name="service_notif_text">Say \"MamY\" to capture or query.</string>
+
+    <!-- Settings -->
+    <string name="settings_section_general">General</string>
+    <string name="settings_section_byok">API keys (BYOK)</string>
+    <string name="settings_section_privacy">Privacy</string>
+    <string name="settings_lang_label">Language</string>
+    <string name="settings_lang_en">English</string>
+    <string name="settings_lang_fr">Français</string>
+    <string name="settings_briefing_schedule">Daily briefing time</string>
+    <string name="settings_byok_claude">Anthropic Claude</string>
+    <string name="settings_byok_openai">OpenAI GPT</string>
+    <string name="settings_byok_gemini">Google Gemini</string>
+    <string name="settings_byok_save">Save key</string>
+    <string name="settings_byok_test">Test connection</string>
+    <string name="settings_open_network_log">Show network calls</string>
+    <string name="settings_export_all">Export everything</string>
+    <string name="settings_wipe_all">Wipe everything</string>
+
+    <!-- Common -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_back">Back</string>
+</resources>
