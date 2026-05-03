@@ -54,7 +54,7 @@ class NoteWriterTest {
 
     @Test
     fun `Success outcome creates Person Note Action Promise Flag rows`() = runTest {
-        coEvery { personDao.findByName(any()) } returns null
+        coEvery { personDao.findByExactName(any()) } returns null
 
         val note = StructuredNote(
             persons = listOf(

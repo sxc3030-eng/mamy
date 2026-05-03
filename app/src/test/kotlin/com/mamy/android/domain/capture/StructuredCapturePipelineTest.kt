@@ -1,8 +1,11 @@
 package com.mamy.android.domain.capture
 
+import android.content.Context
 import com.mamy.android.data.llm.model.StructuredNote
 import com.mamy.android.data.tts.TtsConfirmer
 import com.mamy.android.domain.intent.Intent
+import com.mamy.android.domain.intent.IntentDispatcher
+import com.mamy.android.domain.intent.IntentResult
 import com.mamy.android.domain.intent.IntentRouter
 import com.mamy.android.util.Lang
 import io.mockk.coEvery
@@ -19,7 +22,9 @@ class StructuredCapturePipelineTest {
     private val structurer = mockk<LlmStructurer>()
     private val writer = mockk<NoteWriter>()
     private val tts = mockk<TtsConfirmer>(relaxed = true)
-    private val pipeline = StructuredCapturePipeline(router, structurer, writer, tts)
+    private val dispatcher = mockk<IntentDispatcher>(relaxed = true)
+    private val context = mockk<Context>(relaxed = true)
+    private val pipeline = StructuredCapturePipeline(router, structurer, writer, tts, dispatcher, context)
 
     @Test
     fun `Capture intent runs structurer then writer then tts`() = runTest {
@@ -27,14 +32,14 @@ class StructuredCapturePipelineTest {
         val noteId = UUID.randomUUID()
         val outcome = StructureOutcome.Success(StructuredNote(), "{}", "claude", 100, 50)
 
-        coEvery { router.route(transcript) } returns Intent.Capture(transcript)
+        coEvery { router.classify(transcript) } returns Intent.Capture(transcript)
         coEvery { structurer.structure(transcript, Lang.FR) } returns outcome
         coEvery { writer.write(outcome, transcript, 60) } returns noteId
 
         pipeline.handle(transcript = transcript, language = Lang.FR, durationSec = 60)
 
         coVerifyOrder {
-            router.route(transcript)
+            router.classify(transcript)
             structurer.structure(transcript, Lang.FR)
             writer.write(outcome, transcript, 60)
             tts.confirm(any(), Lang.FR)
@@ -42,13 +47,16 @@ class StructuredCapturePipelineTest {
     }
 
     @Test
-    fun `non-Capture intent skips structurer`() = runTest {
-        coEvery { router.route("MamY ma journée") } returns Intent.DailyBrief
+    fun `non-Capture intent dispatches and skips structurer`() = runTest {
+        val transcript = "MamY ma journée"
+        coEvery { router.classify(transcript) } returns Intent.DailyBrief(transcript)
+        coEvery { dispatcher.dispatch(any()) } returns IntentResult.silent()
 
-        pipeline.handle("MamY ma journée", Lang.FR, 5)
+        pipeline.handle(transcript, Lang.FR, 5)
 
         coVerify(exactly = 0) { structurer.structure(any(), any()) }
         coVerify(exactly = 0) { writer.write(any(), any(), any()) }
+        coVerify { dispatcher.dispatch(any()) }
     }
 
     @Test
@@ -56,7 +64,7 @@ class StructuredCapturePipelineTest {
         val transcript = "x"
         val outcome = StructureOutcome.Failure("network down")
 
-        coEvery { router.route(transcript) } returns Intent.Capture(transcript)
+        coEvery { router.classify(transcript) } returns Intent.Capture(transcript)
         coEvery { structurer.structure(transcript, Lang.EN) } returns outcome
         coEvery { writer.write(outcome, transcript, 30) } returns null
 

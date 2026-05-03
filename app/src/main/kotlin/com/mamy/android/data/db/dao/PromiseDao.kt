@@ -39,4 +39,16 @@ interface PromiseDao {
 
     @Query("DELETE FROM promise WHERE id = :id")
     suspend fun deleteById(id: UUID)
+
+    @Query("SELECT * FROM Promise WHERE to_id = 'self' AND status = 'active' ORDER BY created_at DESC")
+    suspend fun findActiveOwedToSelf(): List<PromiseEntity>
+
+    @Query("SELECT * FROM Promise WHERE from_note_id = :noteId")
+    suspend fun findByNoteId(noteId: UUID): List<PromiseEntity>
+
+    @Query("DELETE FROM Promise WHERE from_note_id = :noteId")
+    suspend fun deleteByNoteId(noteId: UUID): Int
+
+    @Query("SELECT * FROM Promise WHERE from_id = :fromId AND to_id = :toId AND status = 'active' ORDER BY created_at DESC")
+    suspend fun findActiveBetween(fromId: String, toId: String): List<PromiseEntity>
 }
