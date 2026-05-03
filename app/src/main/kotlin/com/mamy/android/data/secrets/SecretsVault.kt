@@ -52,6 +52,12 @@ class SecretsVault(
         prefs.edit().remove(prefKey(key)).apply()
     }
 
+    /** Suspend wrapper around [getSecret], used by LLM-layer code that prefers suspend access. */
+    suspend fun getKey(provider: String): String? = getSecret(provider)
+
+    /** Suspend wrapper around [putSecret]. */
+    suspend fun setKey(provider: String, key: String) = putSecret(provider, key)
+
     /**
      * Returns a stable 32-byte passphrase used to open SQLCipher. Generated once on first call,
      * persisted (encrypted) inside the vault, returned identically on subsequent calls.
