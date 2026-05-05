@@ -72,4 +72,111 @@
     <string name="notif_daily_body">Dis « MamY ma journée » pour l\'écouter.</string>
     <string name="notif_pre_title">5 min avant {title}</string>
     <string name="notif_pre_body">Touche pour écouter, ou dis « MamY briefe ».</string>
+
+    <!-- P7/P9 SettingsScreen sections (W1-C wave1-ui-3) -->
+    <string name="settings_section_general_title">Général</string>
+    <string name="settings_section_byok_title">Clés API et coût</string>
+    <string name="settings_section_briefings_title">Briefings</string>
+    <string name="settings_section_privacy_title">Confidentialité</string>
+    <string name="settings_section_calendar_title">Calendrier</string>
+    <string name="settings_section_sms_title">Commandes SMS</string>
+    <string name="settings_section_wakeword_title">Mot-clé</string>
+    <string name="settings_section_about_title">À propos</string>
+
+    <string name="settings_lang_system">Langue du système</string>
+    <string name="settings_briefing_time_label">Heure du briefing quotidien</string>
+    <string name="settings_briefing_time_value">%1$02d:%2$02d</string>
+    <string name="settings_briefing_pre_meeting">Briefings pré-meeting</string>
+    <string name="settings_tts_voice">Langue de la voix</string>
+    <string name="settings_tts_rate_label">Vitesse TTS</string>
+    <string name="settings_tts_rate_value">%1$.1fx</string>
+
+    <string name="settings_byok_provider_label">Fournisseur</string>
+    <string name="settings_byok_key_label">Clé API</string>
+    <string name="settings_byok_key_masked">Clé enregistrée : %1$s</string>
+    <string name="settings_byok_cost_month">Ce mois : %1$.2f $</string>
+    <string name="settings_byok_cost_per_provider">%1$s : %2$.2f $</string>
+
+    <string name="settings_privacy_mode_label">Mode confidentialité</string>
+    <string name="settings_privacy_mode_standard">Standard</string>
+    <string name="settings_privacy_mode_strict">Strict (zéro cloud)</string>
+    <string name="settings_privacy_mode_hybrid">Hybride + rédaction (V2)</string>
+    <string name="settings_audio_archive">Archiver l\'audio</string>
+    <string name="settings_audio_ttl_label">Durée de conservation audio (jours)</string>
+
+    <string name="settings_calendar_disabled_status">Non connecté. Briefings sur demande seulement.</string>
+
+    <string name="settings_sms_master">Activer commandes SMS</string>
+    <string name="settings_sms_perm_send_status">SEND_SMS</string>
+    <string name="settings_sms_perm_contacts_status">READ_CONTACTS</string>
+    <string name="settings_sms_perm_granted">Autorisé</string>
+    <string name="settings_sms_perm_missing">Manquant — touche pour autoriser</string>
+    <string name="settings_sms_confirm_required">Confirmation vocale obligatoire avant envoi</string>
+    <string name="settings_sms_privacy_label">Mode confidentialité SMS</string>
+    <string name="settings_sms_auto_retry">Réessai auto SMS en attente (V1.1)</string>
+    <string name="settings_sms_audit_log">Voir le journal SMS</string>
+    <string name="settings_sms_v2_hint">Disponible dans une version future</string>
+
+    <string name="settings_wakeword_sensitivity_label">Sensibilité</string>
+    <string name="settings_wakeword_sensitivity_low">Basse</string>
+    <string name="settings_wakeword_sensitivity_med">Moyenne</string>
+    <string name="settings_wakeword_sensitivity_high">Haute</string>
+    <string name="settings_wakeword_test">Tester « MamY »</string>
+
+    <string name="settings_about_version">Version %1$s</string>
+    <string name="settings_about_build">Build %1$s</string>
+
+    <!-- Journal réseau (W1-C wave1-ui-3) -->
+    <string name="networklog_title">Journal réseau</string>
+    <string name="networklog_disclaimer">Appels sortants de MamY. Aucune donnée personnelle ne quitte ton téléphone sauf si une ligne apparaît ici.</string>
+    <string name="networklog_filter_all">Tous</string>
+    <string name="networklog_filter_calendar">Calendrier</string>
+    <string name="networklog_filter_llm">LLM</string>
+    <string name="networklog_filter_stt">STT</string>
+    <string name="networklog_filter_other">Autre</string>
+    <string name="networklog_empty">Aucun appel sortant pour l\'instant.</string>
+    <string name="networklog_status">%1$d · %2$d ms</string>
+    <string name="networklog_method_url">%1$s %2$s</string>
+    <string name="networklog_back">Retour</string>
+
+    <!-- Tes données (W1-C wave1-ui-3) -->
+    <string name="data_title">Tes données</string>
+    <string name="data_section_stats">Statistiques</string>
+    <string name="data_stat_persons">%1$d personnes</string>
+    <string name="data_stat_notes">%1$d notes</string>
+    <string name="data_stat_actions_open">%1$d actions ouvertes</string>
+    <string name="data_stat_sms_sent">%1$d SMS envoyés via MamY</string>
+    <string name="data_section_sms_history">Historique SMS</string>
+    <string name="data_btn_view_all_sms">Voir tous les SMS envoyés</string>
+    <string name="data_section_export">Exporter</string>
+    <string name="data_export_passphrase_label">Mot de passe export (≥ 8 caractères)</string>
+    <string name="data_btn_export_all">Tout exporter (chiffré)</string>
+    <string name="data_export_done">Exporté vers : %1$s</string>
+    <string name="data_export_failure">Échec de l\'export : %1$s</string>
+    <string name="data_section_wipe">Effacer</string>
+    <string name="data_btn_wipe_person">Effacer une personne…</string>
+    <string name="data_btn_wipe_all">Tout effacer</string>
+    <string name="data_wipe_dialog_title">Tout effacer ?</string>
+    <string name="data_wipe_dialog_body">Ceci supprime toutes les personnes, notes, briefings et historique SMS. Tape MamY pour confirmer.</string>
+    <string name="data_wipe_confirm_input">Tape MamY ici</string>
+    <string name="data_wipe_btn_confirm">Effacer</string>
+    <string name="data_wipe_btn_cancel">Annuler</string>
+
+    <!-- Historique SMS (W1-C wave1-ui-3) -->
+    <string name="sms_history_title">SMS envoyés</string>
+    <string name="sms_history_search_hint">Recherche par nom, contenu ou date</string>
+    <string name="sms_history_empty">Aucun SMS envoyé via MamY pour l\'instant.</string>
+    <string name="sms_history_status_pending">En attente</string>
+    <string name="sms_history_status_sent">Envoyé</string>
+    <string name="sms_history_status_delivered">Livré</string>
+    <string name="sms_history_status_failed">Échec</string>
+    <string name="sms_history_status_cancelled">Annulé</string>
+
+    <!-- VoiceIndicator (W1-C wave1-ui-3) -->
+    <string name="voice_indicator_idle">Au repos</string>
+    <string name="voice_indicator_listening">Écoute…</string>
+    <string name="voice_indicator_processing">Réflexion…</string>
+    <string name="voice_indicator_awaiting_sms_confirm">Attente confirmation SMS…</string>
+    <string name="voice_indicator_done">Terminé</string>
+    <string name="voice_indicator_cd">Indicateur vocal MamY : %1$s</string>
 </resources>
