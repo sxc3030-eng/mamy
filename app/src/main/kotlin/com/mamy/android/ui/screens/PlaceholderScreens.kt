@@ -26,13 +26,6 @@ fun PersonDetailScreen(personId: String) =
 fun ActionsScreen() = Centered(stringResource(R.string.screen_actions_title))
 
 @Composable
-fun SettingsScreen(onNetworkLogClick: () -> Unit) =
-    Centered(stringResource(R.string.screen_settings_title))
-
-@Composable
-fun NetworkLogScreen() = Centered(stringResource(R.string.screen_network_log_title))
-
-@Composable
 private fun Centered(text: String) {
     Box(
         modifier = Modifier
