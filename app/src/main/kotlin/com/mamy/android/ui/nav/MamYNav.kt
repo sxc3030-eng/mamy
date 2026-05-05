@@ -8,10 +8,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mamy.android.ui.screens.ActionsScreen
 import com.mamy.android.ui.screens.NetworkLogScreen
-import com.mamy.android.ui.screens.OnboardingScreen
 import com.mamy.android.ui.screens.PersonDetailScreen
-import com.mamy.android.ui.screens.ReportsListScreen
 import com.mamy.android.ui.screens.SettingsScreen
+import com.mamy.android.ui.screens.onboarding.OnboardingRoute
+import com.mamy.android.ui.screens.reports.ReportsListRoute
 
 @Composable
 fun MamYNav() {
@@ -22,12 +22,20 @@ fun MamYNav() {
         startDestination = Routes.ReportsList.path,
     ) {
         composable(Routes.Onboarding.path) {
-            OnboardingScreen()
+            OnboardingRoute(
+                onFinish = {
+                    navController.navigate(Routes.ReportsList.path) {
+                        popUpTo(Routes.Onboarding.path) { inclusive = true }
+                    }
+                },
+            )
         }
         composable(Routes.ReportsList.path) {
-            ReportsListScreen(onPersonClick = { personId ->
-                navController.navigate(Routes.PersonDetail.build(personId))
-            })
+            ReportsListRoute(
+                onPersonClick = { row ->
+                    navController.navigate(Routes.PersonDetail.build(row.id.toString()))
+                },
+            )
         }
         composable(
             route = Routes.PersonDetail.path,
