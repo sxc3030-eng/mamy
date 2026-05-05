@@ -16,12 +16,9 @@ import com.mamy.android.R
 // and com.mamy.android.ui.screens.reports.ReportsListScreen for the real
 // implementations driven by Hilt-injected ViewModels.
 
-@Composable
-fun PersonDetailScreen(personId: String) =
-    Centered(stringResource(R.string.screen_person_detail_title) + " #" + personId)
-
-@Composable
-fun ActionsScreen() = Centered(stringResource(R.string.screen_actions_title))
+// PersonDetailScreen + ActionsScreen are now provided by their dedicated
+// modules in `ui/screens/person/` (PersonDetailRoute) and `ui/screens/actions/`
+// (ActionsRoute). MamYNav wires those routes directly via @HiltViewModel.
 
 @Composable
 fun SettingsScreen(onNetworkLogClick: () -> Unit) =

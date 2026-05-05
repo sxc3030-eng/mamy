@@ -118,4 +118,58 @@
     <string name="reports_empty">No reports yet — say \"MamY note about Jimmy\" to start.</string>
     <string name="reports_last_interaction">Last seen: %1$s</string>
     <string name="reports_unmatched_chip">Unmatched</string>
+
+    <!-- PersonDetail (P7) -->
+    <string name="person_detail_tab_notes">Notes</string>
+    <string name="person_detail_tab_promises">Promises</string>
+    <string name="person_detail_tab_actions">Actions</string>
+    <string name="person_detail_tab_flags">Flags</string>
+    <string name="person_detail_tab_sms">SMS</string>
+    <string name="person_detail_btn_edit">Edit</string>
+    <string name="person_detail_btn_archive">Archive</string>
+    <string name="person_detail_btn_merge">Merge</string>
+    <string name="person_detail_role_unknown">No role</string>
+    <string name="person_detail_interactions">%1$d interactions</string>
+    <string name="person_detail_open_flags">%1$d open flag(s)</string>
+    <string name="person_detail_trend">Trend: %1$s</string>
+    <string name="person_detail_trend_engaged">engaged</string>
+    <string name="person_detail_trend_neutral">neutral</string>
+    <string name="person_detail_trend_disengaged">disengaged</string>
+    <string name="person_detail_promise_due">due %1$s</string>
+    <string name="person_detail_promise_self">me</string>
+    <string name="person_detail_action_deadline">deadline %1$s</string>
+    <string name="person_detail_empty_notes">No notes yet</string>
+    <string name="person_detail_empty_promises">No open promises</string>
+    <string name="person_detail_empty_actions">No open actions</string>
+    <string name="person_detail_empty_flags">No active flags</string>
+    <string name="person_detail_empty_sms">No SMS history</string>
+    <string name="person_detail_sms_status_pending">⏳ pending</string>
+    <string name="person_detail_sms_status_sent">✅ sent</string>
+    <string name="person_detail_sms_status_delivered">✅ delivered</string>
+    <string name="person_detail_sms_status_failed">❌ failed</string>
+    <string name="person_detail_sms_status_cancelled">⛔ cancelled</string>
+    <string name="person_detail_sms_retry">Retry</string>
+    <string name="person_detail_dialog_edit_title">Rename %1$s</string>
+    <string name="person_detail_dialog_edit_label">Name</string>
+    <string name="person_detail_dialog_archive_title">Archive %1$s?</string>
+    <string name="person_detail_dialog_archive_msg">This person will be hidden from the main list. You can restore them later.</string>
+    <string name="person_detail_severity_low">low</string>
+    <string name="person_detail_severity_medium">medium</string>
+    <string name="person_detail_severity_high">high</string>
+    <string name="person_detail_cd_back">Back</string>
+    <string name="person_detail_cd_more">More options</string>
+
+    <!-- Actions screen (P7) -->
+    <string name="actions_title">Open actions</string>
+    <string name="actions_filter_all">All</string>
+    <string name="actions_filter_open">Open</string>
+    <string name="actions_filter_done">Done</string>
+    <string name="actions_empty">Nothing to do</string>
+    <string name="actions_deadline">deadline %1$s</string>
+    <string name="actions_no_deadline">no deadline</string>
+    <string name="actions_no_person">unlinked</string>
+    <string name="actions_status_open">open</string>
+    <string name="actions_status_done">done</string>
+    <string name="actions_cd_done">Mark as done</string>
+    <string name="actions_swipe_hint">Swipe right to mark as done</string>
 </resources>
