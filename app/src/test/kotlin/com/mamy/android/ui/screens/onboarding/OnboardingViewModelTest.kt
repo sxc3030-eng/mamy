@@ -1,6 +1,5 @@
 package com.mamy.android.ui.screens.onboarding
 
-import app.cash.turbine.test
 import com.mamy.android.ui.onboarding.contracts.BYOKManager
 import com.mamy.android.ui.onboarding.contracts.OAuthResult
 import com.mamy.android.ui.onboarding.contracts.OnboardingCalendarRepository
@@ -17,13 +16,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Unit tests for [OnboardingViewModel].
@@ -62,9 +61,7 @@ class OnboardingViewModelTest {
     @Test
     fun `initial state is Permissions step`() = runTest {
         val vm = newVm()
-        vm.state.test {
-            assertEquals(OnboardingStep.Permissions, awaitItem().step)
-        }
+        assertEquals(OnboardingStep.Permissions, vm.state.value.step)
     }
 
     @Test

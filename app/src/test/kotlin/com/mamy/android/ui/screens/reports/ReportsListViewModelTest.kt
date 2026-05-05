@@ -5,19 +5,23 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.UUID
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 /**
  * Unit tests for [ReportsListViewModel].
@@ -64,9 +68,20 @@ class ReportsListViewModelTest {
         openFlagCount = flags,
     )
 
+    /**
+     * Activates the lazy [ReportsListViewModel.state] StateFlow so emissions
+     * propagate. The VM uses [SharingStarted.WhileSubscribed] which is inert
+     * until at least one collector exists. We launch a perpetual collector in
+     * the test scope and rely on [advanceUntilIdle] to flush emissions.
+     */
+    private fun TestScope.activate(vm: ReportsListViewModel) {
+        backgroundScope.launch { vm.state.collect { } }
+    }
+
     @Test
     fun `default sort is Recent`() = runTest {
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         advanceUntilIdle()
         assertEquals(ReportsSort.Recent, vm.state.value.sort)
     }
@@ -74,6 +89,7 @@ class ReportsListViewModelTest {
     @Test
     fun `default hideUnmatched is true`() = runTest {
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         advanceUntilIdle()
         assertTrue(vm.state.value.hideUnmatched)
     }
@@ -82,6 +98,7 @@ class ReportsListViewModelTest {
     fun `Name sort orders ascending case-insensitive`() = runTest {
         source.value = listOf(row("Zoé"), row("alice"), row("Marie"))
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         vm.setSort(ReportsSort.Name)
         advanceUntilIdle()
         val names = vm.state.value.persons.map { it.name }
@@ -92,6 +109,7 @@ class ReportsListViewModelTest {
     fun `Flags sort orders by openFlagCount descending`() = runTest {
         source.value = listOf(row("a", flags = 1), row("b", flags = 5), row("c", flags = 0))
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         vm.setSort(ReportsSort.Flags)
         advanceUntilIdle()
         val flags = vm.state.value.persons.map { it.openFlagCount }
@@ -107,6 +125,7 @@ class ReportsListViewModelTest {
             row("middle", lastSeen = now.minusSeconds(60)),
         )
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         advanceUntilIdle()
         val names = vm.state.value.persons.map { it.name }
         assertEquals(listOf("recent", "middle", "old"), names)
@@ -116,6 +135,7 @@ class ReportsListViewModelTest {
     fun `setQuery filters by case-insensitive substring`() = runTest {
         source.value = listOf(row("Marie Tremblay"), row("Pierre Lavoie"), row("MARIANNE"))
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         vm.setQuery("mari")
         advanceUntilIdle()
         val names = vm.state.value.persons.map { it.name }.sorted()
@@ -126,6 +146,7 @@ class ReportsListViewModelTest {
     fun `empty query returns all persons`() = runTest {
         source.value = listOf(row("Alice"), row("Bob"))
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         vm.setQuery("")
         advanceUntilIdle()
         assertEquals(2, vm.state.value.persons.size)
@@ -134,6 +155,7 @@ class ReportsListViewModelTest {
     @Test
     fun `toggleHideUnmatched flips state`() = runTest {
         val vm = ReportsListViewModel(repo)
+        activate(vm)
         advanceUntilIdle()
         assertTrue(vm.state.value.hideUnmatched)
         vm.toggleHideUnmatched()
