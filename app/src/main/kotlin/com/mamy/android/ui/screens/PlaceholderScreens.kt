@@ -11,12 +11,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.mamy.android.R
 
-@Composable
-fun OnboardingScreen() = Centered(stringResource(R.string.screen_onboarding_title))
-
-@Composable
-fun ReportsListScreen(onPersonClick: (String) -> Unit) =
-    Centered(stringResource(R.string.screen_reports_title))
+// NOTE (W1-A 2026-05-03) : OnboardingScreen + ReportsListScreen placeholders
+// removed — see com.mamy.android.ui.screens.onboarding.OnboardingScreen
+// and com.mamy.android.ui.screens.reports.ReportsListScreen for the real
+// implementations driven by Hilt-injected ViewModels.
 
 @Composable
 fun PersonDetailScreen(personId: String) =

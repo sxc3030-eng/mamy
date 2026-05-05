@@ -72,4 +72,50 @@
     <string name="notif_daily_body">Dis « MamY ma journée » pour l\'écouter.</string>
     <string name="notif_pre_title">5 min avant {title}</string>
     <string name="notif_pre_body">Touche pour écouter, ou dis « MamY briefe ».</string>
+
+    <!-- Onboarding (P7 multi-step) -->
+    <string name="onboarding_title">Bienvenue dans MamY</string>
+    <string name="onboarding_step_progress">Étape %1$d sur %2$d</string>
+    <string name="onboarding_btn_back">Retour</string>
+    <string name="onboarding_btn_save">Enregistrer</string>
+    <string name="onboarding_permissions_body">MamY a besoin du micro, du micro en service de premier plan et des notifications pour écouter le mot d\'éveil.</string>
+    <string name="onboarding_permissions_oem_hint">Samsung/Xiaomi : ajoute MamY à ta liste blanche batterie pour que l\'écoute en arrière-plan continue.</string>
+    <string name="onboarding_btn_grant">Accorder les permissions</string>
+    <string name="onboarding_wakeword_model_body">MamY utilise le moteur de mot-clé Picovoice Porcupine.</string>
+    <string name="onboarding_wakeword_model_steps">1. Crée un compte gratuit Picovoice Console et copie ton AccessKey.\n2. Entraîne deux mots-clés perso (« MamY » en anglais et français).\n3. Dépose mamy_en.ppn et mamy_fr.ppn dans le dossier assets/wakeword/ de l\'app.</string>
+    <string name="onboarding_wakeword_accesskey_label">AccessKey Picovoice</string>
+    <string name="onboarding_wakeword_accesskey_set">AccessKey enregistrée : %1$s</string>
+    <string name="onboarding_byok_body">Fournis ta propre clé LLM (BYOK). Elle reste sur l\'appareil.</string>
+    <string name="onboarding_byok_provider_label">Fournisseur</string>
+    <string name="onboarding_byok_key_label">Clé API</string>
+    <string name="onboarding_btn_test_byok">Tester &amp; enregistrer</string>
+    <string name="onboarding_calendar_body">Connecte ton Google Calendar pour que MamY te briefe avant chaque réunion.</string>
+    <string name="onboarding_calendar_connected_as">Connecté en tant que %1$s</string>
+    <string name="onboarding_btn_connect_google">Connecter Google Calendar</string>
+    <string name="onboarding_btn_skip">Passer</string>
+    <string name="onboarding_wakeword_body">Dis « MamY test 1 2 3 » maintenant pour tester le mot d\'éveil.</string>
+    <string name="onboarding_btn_test_wakeword">Tester le mot d\'éveil</string>
+    <string name="onboarding_done_body">Tout est prêt. MamY écoute en arrière-plan.</string>
+    <string name="onboarding_btn_finish">Terminé</string>
+
+    <!-- Onboarding SMS step (NEW from P9) -->
+    <string name="onboarding_sms_title">SMS à la voix</string>
+    <string name="onboarding_sms_body">Envoie tes SMS sans toucher ton tel : dis « MamY texte à Jimmy que je serai en retard » — MamY rédige, demande confirmation vocale, puis envoie.</string>
+    <string name="onboarding_sms_perms_explain">Demande READ_CONTACTS pour trouver les contacts, et SEND_SMS pour envoyer. Tout reste sur l\'appareil. Aucun SMS n\'est lu.</string>
+    <string name="onboarding_sms_btn_enable">Activer SMS vocaux</string>
+    <string name="onboarding_sms_btn_skip">Plus tard</string>
+
+    <!-- Reports list (P7) -->
+    <string name="reports_title">Reports</string>
+    <string name="reports_search_label">Rechercher</string>
+    <string name="reports_show_unmatched">Afficher non-matchés</string>
+    <string name="reports_hide_unmatched">Cacher non-matchés</string>
+    <string name="reports_sort_recent">Récent</string>
+    <string name="reports_sort_name">Nom</string>
+    <string name="reports_sort_flags">Flags</string>
+    <string name="reports_interaction_count">%1$d interactions</string>
+    <string name="reports_no_role">Aucun rôle</string>
+    <string name="reports_empty">Aucun report — dis « MamY note sur Jimmy » pour commencer.</string>
+    <string name="reports_last_interaction">Vu : %1$s</string>
+    <string name="reports_unmatched_chip">Non-matché</string>
 </resources>
