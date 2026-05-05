@@ -27,4 +27,5 @@ data class PersonEntity(
     @ColumnInfo(name = "emotional_trend") val emotionalTrend: String?,
     val unmatched: Boolean,
     val archived: Boolean,
+    @ColumnInfo(name = "android_contact_id") val androidContactId: String? = null,
 )
