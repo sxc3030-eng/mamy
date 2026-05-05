@@ -2,9 +2,9 @@ package com.mamy.android.ui.overlay
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertSame
 
 class VoiceIndicatorBusTest {
 

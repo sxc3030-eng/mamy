@@ -16,7 +16,7 @@ import javax.inject.Inject
 /**
  * ViewModel for [DataScreen]: aggregates [DataStatsSource] and SMS counts into
  * a single state, drives export / wipe through [DataActions]. Stub
- * implementations of all three live in `data/*Source.kt` until W1-E and P8 wire
+ * implementations of all three live in the data package until W1-E and P8 wire
  * the real ones via the same Hilt bindings.
  */
 @HiltViewModel

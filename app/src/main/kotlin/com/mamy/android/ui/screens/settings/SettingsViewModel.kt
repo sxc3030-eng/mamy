@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.YearMonth
 import javax.inject.Inject
 
 /**
@@ -50,7 +51,7 @@ class SettingsViewModel @Inject constructor(
 
     private val sideFlow = combine(
         calendarSettings.isCalendarEnabled,
-        costTracker.monthlyCosts(),
+        costTracker.monthlyCosts(YearMonth.now()),
     ) { calConnected, costs -> calConnected to costs }
 
     private val smsFlow = combine(

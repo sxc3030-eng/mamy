@@ -1,6 +1,5 @@
 package com.mamy.android.ui.screens.settings
 
-import app.cash.turbine.test
 import com.mamy.android.data.llm.cost.LlmCostTracker
 import com.mamy.android.data.settings.CalendarSettings
 import com.mamy.android.data.settings.SettingsRepository
@@ -12,6 +11,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -57,21 +57,18 @@ class SettingsViewModelTest {
 
     @Test
     fun `initial state surfaces defaults`() = runTest {
+        // Pre-set non-default values so we can detect that the combine resolved.
+        languageFlow.value = Language.FR
+        smsConfirmFlow.value = true
+
         val vm = SettingsViewModel(repo, calendarSettings, costTracker)
-        vm.state.test {
-            // Drain initial values; final emission has actual data.
-            var s = awaitItem()
-            // Allow up to 2 intermediate emissions while inner flows compose.
-            repeat(2) {
-                if (s == SettingsUiState()) s = awaitItem()
-            }
-            assertEquals(Language.SYSTEM, s.language)
-            assertEquals(LlmProvider.CLAUDE, s.provider)
-            assertEquals(PrivacyMode.STANDARD, s.privacyMode)
-            assertEquals(false, s.sms.masterEnabled)
-            assertTrue(s.sms.confirmRequired, "SMS confirm-required defaults ON per D19")
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Wait for the combine to resolve to a non-empty state (FR != SYSTEM default).
+        val finalState = vm.state.first { it.language == Language.FR }
+        assertEquals(Language.FR, finalState.language)
+        assertEquals(LlmProvider.CLAUDE, finalState.provider)
+        assertEquals(PrivacyMode.STANDARD, finalState.privacyMode)
+        assertEquals(false, finalState.sms.masterEnabled)
+        assertTrue(finalState.sms.confirmRequired, "SMS confirm-required defaults ON per D19")
     }
 
     @Test

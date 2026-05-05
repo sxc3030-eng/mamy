@@ -2,7 +2,7 @@ package com.mamy.android.ui.overlay
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -72,7 +72,7 @@ fun VoiceIndicator(
     val tagSuffix = state.testTagSuffix()
 
     val infinite = rememberInfiniteTransition(label = "voice-indicator-pulse")
-    val anim by infinite.animateFloatAsState(
+    val anim by infinite.animateFloat(
         initialValue = 0.55f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
