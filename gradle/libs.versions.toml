@@ -36,6 +36,7 @@ serialization = "1.7.3"
 credentials = "1.5.0"
 google-id = "1.1.1"
 play-services-auth = "21.2.0"
+accompanist-permissions = "0.36.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -105,6 +106,7 @@ play-services-auth = { group = "com.google.android.gms", name = "play-services-a
 hilt-work = { group = "androidx.hilt", name = "hilt-work", version = "1.2.0" }
 hilt-compiler-androidx = { group = "androidx.hilt", name = "hilt-compiler", version = "1.2.0" }
 work-testing = { group = "androidx.work", name = "work-testing", version.ref = "work" }
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist-permissions" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -139,6 +139,8 @@ dependencies {
     implementation(libs.hilt.work)
     kapt(libs.hilt.compiler.androidx)
 
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.work.testing)
 
