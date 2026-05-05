@@ -72,4 +72,58 @@
     <string name="notif_daily_body">Dis « MamY ma journée » pour l\'écouter.</string>
     <string name="notif_pre_title">5 min avant {title}</string>
     <string name="notif_pre_body">Touche pour écouter, ou dis « MamY briefe ».</string>
+
+    <!-- PersonDetail (P7) -->
+    <string name="person_detail_tab_notes">Notes</string>
+    <string name="person_detail_tab_promises">Promesses</string>
+    <string name="person_detail_tab_actions">Actions</string>
+    <string name="person_detail_tab_flags">Alertes</string>
+    <string name="person_detail_tab_sms">SMS</string>
+    <string name="person_detail_btn_edit">Renommer</string>
+    <string name="person_detail_btn_archive">Archiver</string>
+    <string name="person_detail_btn_merge">Fusionner</string>
+    <string name="person_detail_role_unknown">Sans rôle</string>
+    <string name="person_detail_interactions">%1$d interactions</string>
+    <string name="person_detail_open_flags">%1$d alerte(s) ouverte(s)</string>
+    <string name="person_detail_trend">Tendance : %1$s</string>
+    <string name="person_detail_trend_engaged">engagé</string>
+    <string name="person_detail_trend_neutral">neutre</string>
+    <string name="person_detail_trend_disengaged">désengagé</string>
+    <string name="person_detail_promise_due">dû le %1$s</string>
+    <string name="person_detail_promise_self">moi</string>
+    <string name="person_detail_action_deadline">échéance %1$s</string>
+    <string name="person_detail_empty_notes">Aucune note pour le moment</string>
+    <string name="person_detail_empty_promises">Aucune promesse ouverte</string>
+    <string name="person_detail_empty_actions">Aucune action ouverte</string>
+    <string name="person_detail_empty_flags">Aucune alerte active</string>
+    <string name="person_detail_empty_sms">Aucun SMS</string>
+    <string name="person_detail_sms_status_pending">⏳ en attente</string>
+    <string name="person_detail_sms_status_sent">✅ envoyé</string>
+    <string name="person_detail_sms_status_delivered">✅ livré</string>
+    <string name="person_detail_sms_status_failed">❌ échec</string>
+    <string name="person_detail_sms_status_cancelled">⛔ annulé</string>
+    <string name="person_detail_sms_retry">Réessayer</string>
+    <string name="person_detail_dialog_edit_title">Renommer %1$s</string>
+    <string name="person_detail_dialog_edit_label">Nom</string>
+    <string name="person_detail_dialog_archive_title">Archiver %1$s ?</string>
+    <string name="person_detail_dialog_archive_msg">Cette personne sera masquée. Tu pourras la restaurer plus tard.</string>
+    <string name="person_detail_severity_low">faible</string>
+    <string name="person_detail_severity_medium">moyenne</string>
+    <string name="person_detail_severity_high">élevée</string>
+    <string name="person_detail_cd_back">Retour</string>
+    <string name="person_detail_cd_more">Plus d\'options</string>
+
+    <!-- Écran Actions (P7) -->
+    <string name="actions_title">Actions ouvertes</string>
+    <string name="actions_filter_all">Toutes</string>
+    <string name="actions_filter_open">Ouvertes</string>
+    <string name="actions_filter_done">Faites</string>
+    <string name="actions_empty">Rien à faire</string>
+    <string name="actions_deadline">échéance %1$s</string>
+    <string name="actions_no_deadline">sans échéance</string>
+    <string name="actions_no_person">non liée</string>
+    <string name="actions_status_open">ouverte</string>
+    <string name="actions_status_done">faite</string>
+    <string name="actions_cd_done">Marquer comme faite</string>
+    <string name="actions_swipe_hint">Glisse à droite pour marquer comme faite</string>
 </resources>
