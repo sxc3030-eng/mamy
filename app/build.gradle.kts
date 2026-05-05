@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,6 +9,16 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
 }
+
+// Load signing.properties (repo root) if present; else release will fall back to debug.
+val signingPropsFile = rootProject.file("signing.properties")
+val signingProps = Properties().apply {
+    if (signingPropsFile.exists()) {
+        signingPropsFile.inputStream().use { load(it) }
+    }
+}
+val hasReleaseSigning = signingProps.getProperty("storeFile")?.isNotBlank() == true
+        && rootProject.file(signingProps.getProperty("storeFile") ?: "").exists()
 
 android {
     namespace = "com.mamy.android"
@@ -41,10 +53,32 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(signingProps.getProperty("storeFile"))
+                storePassword = signingProps.getProperty("storePassword")
+                keyAlias = signingProps.getProperty("keyAlias")
+                keyPassword = signingProps.getProperty("keyPassword")
+                // Enable v1+v2+v3+v4 signing schemes for max compatibility.
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+                enableV4Signing = true
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = if (hasReleaseSigning) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
         debug {
             isMinifyEnabled = false
