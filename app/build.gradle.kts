@@ -130,6 +130,7 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.libphonenumber)
 
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
