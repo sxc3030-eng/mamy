@@ -15,6 +15,24 @@ class IntentRouterTest {
     }
 
     @Test
+    fun `text_to FR routes to TextTo`() {
+        val intent = router.classify("MamY texte à Jimmy que c'est bon pour ce soir")
+        assertTrue(intent is Intent.TextTo, "expected TextTo but got $intent")
+        intent as Intent.TextTo
+        assertEquals("Jimmy", intent.who)
+        assertEquals("c'est bon pour ce soir", intent.body)
+    }
+
+    @Test
+    fun `text_to EN routes to TextTo`() {
+        val intent = router.classify("MamY text Jimmy that I'm running late")
+        assertTrue(intent is Intent.TextTo, "expected TextTo but got $intent")
+        intent as Intent.TextTo
+        assertEquals("Jimmy", intent.who)
+        assertEquals("I'm running late", intent.body)
+    }
+
+    @Test
     fun `daily_brief FR routes`() {
         val intent = router.classify("MamY, ma journée")
         assertTrue(intent is Intent.DailyBrief)

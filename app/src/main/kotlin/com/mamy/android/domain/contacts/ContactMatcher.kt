@@ -54,6 +54,6 @@ sealed class MatchResult {
  * so the orchestrator branch executes the "no contact found" path. The merge
  * with W1-D will swap this out for the real cascade matcher.
  */
-class EmptyContactMatcher : ContactMatcher {
+class EmptyContactMatcher @javax.inject.Inject constructor() : ContactMatcher {
     override suspend fun findByName(query: String): MatchResult = MatchResult.None
 }
