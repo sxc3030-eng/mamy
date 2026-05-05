@@ -6,13 +6,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mamy.android.ui.screens.NetworkLogScreen
-import com.mamy.android.ui.screens.SettingsScreen
 import com.mamy.android.ui.screens.actions.ActionsRoute
+import com.mamy.android.ui.screens.data.DataRoute
+import com.mamy.android.ui.screens.networklog.NetworkLogRoute
 import com.mamy.android.ui.screens.onboarding.OnboardingRoute
 import com.mamy.android.ui.screens.person.PersonDetailRoute
 import com.mamy.android.ui.screens.person.PersonDetailViewModel
 import com.mamy.android.ui.screens.reports.ReportsListRoute
+import com.mamy.android.ui.screens.settings.SettingsRoute
+import com.mamy.android.ui.screens.sms.SmsHistoryRoute
 
 @Composable
 fun MamYNav() {
@@ -52,12 +54,22 @@ fun MamYNav() {
             ActionsRoute()
         }
         composable(Routes.Settings.path) {
-            SettingsScreen(onNetworkLogClick = {
-                navController.navigate(Routes.NetworkLog.path)
-            })
+            SettingsRoute(
+                onOpenNetworkLog = { navController.navigate(Routes.NetworkLog.path) },
+                onOpenData = { navController.navigate(Routes.Data.path) },
+                onOpenSmsAuditLog = { navController.navigate(Routes.NetworkLog.path) },
+            )
         }
         composable(Routes.NetworkLog.path) {
-            NetworkLogScreen()
+            NetworkLogRoute(onBack = { navController.popBackStack() })
+        }
+        composable(Routes.Data.path) {
+            DataRoute(
+                onOpenSmsHistory = { navController.navigate(Routes.SmsHistory.path) },
+            )
+        }
+        composable(Routes.SmsHistory.path) {
+            SmsHistoryRoute()
         }
     }
 }

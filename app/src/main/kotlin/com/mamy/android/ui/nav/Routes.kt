@@ -9,4 +9,7 @@ sealed class Routes(val path: String) {
     data object Actions : Routes("actions")
     data object Settings : Routes("settings")
     data object NetworkLog : Routes("settings/network-log")
+    // Added by W1-C wave1-ui-3: data + sms history sub-routes
+    data object Data : Routes("settings/data")
+    data object SmsHistory : Routes("data/sms-history")
 }
