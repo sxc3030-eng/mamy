@@ -2,6 +2,7 @@ package com.mamy.android.data.settings
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -84,6 +85,42 @@ class SettingsRepository(
         dataStore.edit { it[KEY_WAKEWORD_SENSITIVITY] = level }
     }
 
+    // ---------- P9 SMS settings (added by W1-C wave1-ui-3) ----------
+
+    val smsMasterEnabledFlow: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[KEY_SMS_MASTER_ENABLED] ?: false
+    }
+
+    val smsConfirmRequiredFlow: Flow<Boolean> = dataStore.data.map { prefs ->
+        // Default ON for safety (D19) — user must opt out explicitly.
+        prefs[KEY_SMS_CONFIRM_REQUIRED] ?: true
+    }
+
+    val smsPrivacyModeFlow: Flow<PrivacyMode> = dataStore.data.map { prefs ->
+        prefs[KEY_SMS_PRIVACY_MODE]?.let(::safePrivacy) ?: PrivacyMode.STANDARD
+    }
+
+    val smsAutoRetryEnabledFlow: Flow<Boolean> = dataStore.data.map { prefs ->
+        // V1.1 feature, default OFF
+        prefs[KEY_SMS_AUTO_RETRY_ENABLED] ?: false
+    }
+
+    suspend fun setSmsMasterEnabled(enabled: Boolean) {
+        dataStore.edit { it[KEY_SMS_MASTER_ENABLED] = enabled }
+    }
+
+    suspend fun setSmsConfirmRequired(required: Boolean) {
+        dataStore.edit { it[KEY_SMS_CONFIRM_REQUIRED] = required }
+    }
+
+    suspend fun setSmsPrivacyMode(value: PrivacyMode) {
+        dataStore.edit { it[KEY_SMS_PRIVACY_MODE] = value.name }
+    }
+
+    suspend fun setSmsAutoRetryEnabled(enabled: Boolean) {
+        dataStore.edit { it[KEY_SMS_AUTO_RETRY_ENABLED] = enabled }
+    }
+
     private fun safeLanguage(raw: String): Language =
         runCatching { Language.valueOf(raw) }.getOrDefault(Language.SYSTEM)
 
@@ -129,6 +166,12 @@ class SettingsRepository(
         private val KEY_WAKEWORD_SENSITIVITY = intPreferencesKey("wakeword_sensitivity")
         private val KEY_LOCALE_TAG = stringPreferencesKey("locale_tag")
         private val KEY_TTS_RATE = floatPreferencesKey("tts_rate")
+
+        // P9 SMS keys (W1-C added)
+        private val KEY_SMS_MASTER_ENABLED = booleanPreferencesKey("sms_master_enabled")
+        private val KEY_SMS_CONFIRM_REQUIRED = booleanPreferencesKey("sms_confirm_required")
+        private val KEY_SMS_PRIVACY_MODE = stringPreferencesKey("sms_privacy_mode")
+        private val KEY_SMS_AUTO_RETRY_ENABLED = booleanPreferencesKey("sms_auto_retry_enabled")
 
         const val DEFAULT_BRIEFING_HOUR = 8
         const val DEFAULT_WAKEWORD_SENSITIVITY = 1
