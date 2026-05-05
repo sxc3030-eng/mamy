@@ -29,6 +29,9 @@ desktop.ini
 # Secrets / keys (NEVER commit)
 *.keystore
 *.jks
+keystore/*.jks
+keystore/PASSWORDS.txt
+signing.properties
 google-services.json
 GoogleService-Info.plist
 api-keys/
