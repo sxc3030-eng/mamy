@@ -21,6 +21,12 @@ class IntentRouter @Inject constructor() {
     fun classify(transcript: String): Intent {
         val trimmed = transcript.trim()
 
+        // P9 — text_to (must precede CAPTURE since "texte à" doesn't overlap with
+        // "prends note" but the regex is specific so we route it early).
+        IntentGrammar.matchTextTo(trimmed)?.let { (who, body) ->
+            return Intent.TextTo(who = who, body = body, rawText = trimmed)
+        }
+
         // Person brief variants (must beat next_brief)
         IntentGrammar.PERSON_BRIEF_DIRECT.find(trimmed)?.let { match ->
             return Intent.PersonBrief(

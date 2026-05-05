@@ -12,6 +12,7 @@ import com.mamy.android.data.db.dao.MeetingDao
 import com.mamy.android.data.db.dao.NoteDao
 import com.mamy.android.data.db.dao.PersonDao
 import com.mamy.android.data.db.dao.PromiseDao
+import com.mamy.android.data.db.dao.SentSmsDao
 import com.mamy.android.data.db.entity.ActionEntity
 import com.mamy.android.data.db.entity.BriefingEntity
 import com.mamy.android.data.db.entity.FlagEntity
@@ -20,6 +21,7 @@ import com.mamy.android.data.db.entity.MeetingEntity
 import com.mamy.android.data.db.entity.NoteEntity
 import com.mamy.android.data.db.entity.PersonEntity
 import com.mamy.android.data.db.entity.PromiseEntity
+import com.mamy.android.data.db.entity.SentSmsEntry
 import com.mamy.android.data.llm.cost.LlmCostDao
 import com.mamy.android.data.llm.cost.LlmCostEntry
 
@@ -34,8 +36,9 @@ import com.mamy.android.data.llm.cost.LlmCostEntry
         MeetingAttendeeEntity::class,
         BriefingEntity::class,
         LlmCostEntry::class,
+        SentSmsEntry::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -50,6 +53,7 @@ abstract class MamYDatabase : RoomDatabase() {
     abstract fun meetingAttendeeDao(): MeetingAttendeeDao
     abstract fun briefingDao(): BriefingDao
     abstract fun llmCostDao(): LlmCostDao
+    abstract fun sentSmsDao(): SentSmsDao
 
     companion object {
         const val DB_NAME = "mamy.db"

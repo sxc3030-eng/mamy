@@ -8,6 +8,7 @@ import com.mamy.android.domain.intent.handler.EodSummaryHandler
 import com.mamy.android.domain.intent.handler.NextBriefHandler
 import com.mamy.android.domain.intent.handler.PersonBriefHandler
 import com.mamy.android.domain.intent.handler.PromisesOwedMeHandler
+import com.mamy.android.domain.intent.handler.TextToHandler
 import com.mamy.android.domain.intent.handler.UndoLastHandler
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -26,9 +27,10 @@ class IntentDispatcherTest {
     private val eod: EodSummaryHandler = mockk(relaxed = true)
     private val undo: UndoLastHandler = mockk(relaxed = true)
     private val correct: CorrectLastHandler = mockk(relaxed = true)
+    private val textTo: TextToHandler = mockk(relaxed = true)
 
     private val dispatcher = IntentDispatcher(
-        capture, daily, next, personBrief, owed, open, eod, undo, correct,
+        capture, daily, next, personBrief, owed, open, eod, undo, correct, textTo,
     )
 
     @Test
@@ -71,5 +73,18 @@ class IntentDispatcherTest {
         coEvery { correct.handle(any()) } returns IntentResult.silent()
         dispatcher.dispatch(Intent.CorrectLast("x", "MamY, modifie : x"))
         coVerify { correct.handle(any()) }
+    }
+
+    @Test
+    fun `TextTo routes to TextToHandler`() = runTest {
+        coEvery { textTo.dispatch(any()) } returns IntentResult.silent()
+        dispatcher.dispatch(
+            Intent.TextTo(
+                who = "Jimmy",
+                body = "c'est bon",
+                rawText = "MamY texte à Jimmy que c'est bon",
+            ),
+        )
+        coVerify { textTo.dispatch(any()) }
     }
 }

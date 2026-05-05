@@ -8,6 +8,7 @@ import com.mamy.android.domain.intent.handler.EodSummaryHandler
 import com.mamy.android.domain.intent.handler.NextBriefHandler
 import com.mamy.android.domain.intent.handler.PersonBriefHandler
 import com.mamy.android.domain.intent.handler.PromisesOwedMeHandler
+import com.mamy.android.domain.intent.handler.TextToHandler
 import com.mamy.android.domain.intent.handler.UndoLastHandler
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -30,10 +31,11 @@ class IntentEndToEndTest {
     private val eod: EodSummaryHandler = mockk()
     private val undo: UndoLastHandler = mockk()
     private val correct: CorrectLastHandler = mockk()
+    private val textTo: TextToHandler = mockk()
 
     private val router = IntentRouter()
     private val dispatcher = IntentDispatcher(
-        capture, daily, next, personBrief, owed, open, eod, undo, correct,
+        capture, daily, next, personBrief, owed, open, eod, undo, correct, textTo,
     )
 
     @Test
