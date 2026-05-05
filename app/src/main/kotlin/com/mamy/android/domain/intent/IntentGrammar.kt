@@ -67,4 +67,48 @@ object IntentGrammar {
         pattern = """^MamY,?\s+(modifie|edit)\s*:?\s*(.+?)\s*$""",
         options = IGNORE,
     )
+
+    // ----- P9 SMS text_to grammar (spec annex A) -----
+
+    /**
+     * "MamY texte à <who> que <body>", "MamY envoie un texto à <who> : <body>",
+     * "MamY dis à <who> que <body>". Named groups : `who`, `body`.
+     */
+    val TEXT_TO_FR: Regex = Regex(
+        pattern = "^MamY,?\\s+(?:texte|envoie\\s+(?:un\\s+)?(?:texto|sms)|dis)\\s+" +
+            "(?:à\\s+)?(?<who>[\\w\\-'\\u00C0-\\u017F]+(?:\\s+[\\w\\-'\\u00C0-\\u017F]+)?)" +
+            "\\s+(?:que\\s+|dis(?:-?lui)?\\s+|:\\s*|,\\s*)" +
+            "(?<body>.+)\$",
+        options = IGNORE,
+    )
+
+    /**
+     * "MamY text <who> that <body>", "MamY send (a) text/sms to <who> : <body>",
+     * "MamY text <who> saying <body>". Named groups : `who`, `body`.
+     */
+    val TEXT_TO_EN: Regex = Regex(
+        pattern = "^MamY,?\\s+(?:text|send\\s+(?:a\\s+)?(?:text|sms)\\s+to)\\s+" +
+            "(?:to\\s+)?(?<who>[\\w\\-']+(?:\\s+[\\w\\-']+)?)" +
+            "\\s+(?:that\\s+|saying\\s+|:\\s*|,\\s*)" +
+            "(?<body>.+)\$",
+        options = IGNORE,
+    )
+
+    /**
+     * Tries [TEXT_TO_FR] then [TEXT_TO_EN] against [transcript], returning a
+     * (who, body) pair after sanitizing whitespace. Returns null on miss.
+     *
+     * Validation rules (post-extraction) :
+     *  - `who`   : 1-50 chars
+     *  - `body`  : >= 3 chars, <= 320 chars (cap at 2 SMS segments)
+     */
+    fun matchTextTo(transcript: String): Pair<String, String>? {
+        val trimmed = transcript.trim()
+        val match = TEXT_TO_FR.find(trimmed) ?: TEXT_TO_EN.find(trimmed) ?: return null
+        val who = match.groups["who"]?.value?.trim().orEmpty()
+        val body = match.groups["body"]?.value?.trim().orEmpty()
+        if (who.isEmpty() || who.length > 50) return null
+        if (body.length < 3 || body.length > 320) return null
+        return who to body
+    }
 }

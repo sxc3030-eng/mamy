@@ -16,6 +16,16 @@ sealed class Intent {
     data class EodSummary(override val rawText: String) : Intent()
     data class UndoLast(override val rawText: String) : Intent()
     data class CorrectLast(val correctedText: String, override val rawText: String) : Intent()
+
+    /**
+     * P9 — "MamY texte à \<who\> que \<body\>" / "MamY text \<who\> that \<body\>".
+     * Extraction is performed by [IntentGrammar] regexes (FR + EN).
+     */
+    data class TextTo(
+        val who: String,
+        val body: String,
+        override val rawText: String,
+    ) : Intent()
 }
 
 /**
