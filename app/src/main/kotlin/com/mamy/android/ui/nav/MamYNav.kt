@@ -19,32 +19,32 @@ fun MamYNav() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.ReportsList.path,
+        startDestination = Routes.ReportsList.route,
     ) {
-        composable(Routes.Onboarding.path) {
+        composable(Routes.Onboarding.route) {
             OnboardingScreen()
         }
-        composable(Routes.ReportsList.path) {
+        composable(Routes.ReportsList.route) {
             ReportsListScreen(onPersonClick = { personId ->
-                navController.navigate(Routes.PersonDetail.build(personId))
+                navController.navigate(Routes.PersonDetail.path(personId))
             })
         }
         composable(
-            route = Routes.PersonDetail.path,
-            arguments = listOf(navArgument("personId") { type = NavType.StringType }),
+            route = Routes.PersonDetail.route,
+            arguments = listOf(navArgument(Routes.PersonDetail.ARG_PERSON_ID) { type = NavType.StringType }),
         ) { backStack ->
-            val id = backStack.arguments?.getString("personId").orEmpty()
+            val id = backStack.arguments?.getString(Routes.PersonDetail.ARG_PERSON_ID).orEmpty()
             PersonDetailScreen(personId = id)
         }
-        composable(Routes.Actions.path) {
+        composable(Routes.Actions.route) {
             ActionsScreen()
         }
-        composable(Routes.Settings.path) {
+        composable(Routes.Settings.route) {
             SettingsScreen(onNetworkLogClick = {
-                navController.navigate(Routes.NetworkLog.path)
+                navController.navigate(Routes.NetworkLog.route)
             })
         }
-        composable(Routes.NetworkLog.path) {
+        composable(Routes.NetworkLog.route) {
             NetworkLogScreen()
         }
     }
