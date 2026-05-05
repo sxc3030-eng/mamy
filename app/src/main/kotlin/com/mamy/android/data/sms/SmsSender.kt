@@ -35,6 +35,10 @@ import javax.inject.Singleton
  * The sender is intentionally side-effect heavy : it is the "edge" between
  * MamY's domain model and the Android telephony stack. All branching beyond
  * "pick a recipient" lives in [com.mamy.android.domain.intent.handler.TextToHandler].
+ *
+ * [smsManagerProvider] is exposed as a constructor seam so unit tests can
+ * inject a mocked [SmsManager] without trying to override the final
+ * [Context.getSystemService] method.
  */
 @Singleton
 class SmsSender @Inject constructor(
@@ -42,6 +46,9 @@ class SmsSender @Inject constructor(
     private val sentSmsDao: SentSmsDao,
     private val clock: Clock,
 ) {
+
+    /** Test seam : production code resolves the SmsManager via system service ; tests override. */
+    internal var smsManagerProvider: () -> SmsManager = { defaultResolveSmsManager() }
 
     /**
      * Persist + dispatch an SMS.
@@ -70,7 +77,7 @@ class SmsSender @Inject constructor(
     ): SmsResult {
         if (!hasSendSmsPermission()) return SmsResult.PermissionDenied
 
-        val sms: SmsManager = resolveSmsManager()
+        val sms: SmsManager = smsManagerProvider()
         val parts = sms.divideMessage(body) ?: arrayListOf(body)
         val segments = parts.size.coerceAtLeast(1)
 
@@ -124,7 +131,7 @@ class SmsSender @Inject constructor(
             PackageManager.PERMISSION_GRANTED
 
     @Suppress("DEPRECATION")
-    private fun resolveSmsManager(): SmsManager =
+    private fun defaultResolveSmsManager(): SmsManager =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             context.getSystemService(SmsManager::class.java)
         } else {

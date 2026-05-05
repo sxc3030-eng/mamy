@@ -177,7 +177,7 @@ class SmsSenderTest {
     }
 
     /** Wires SmsSender against a real Robolectric context with SEND_SMS granted, and
-     *  swaps `Context.getSystemService(SmsManager::class.java)` to return our mock. */
+     *  uses the SmsSender.smsManagerProvider seam to inject the mock. */
     private fun senderWithMockSmsManager(
         parts: ArrayList<String> = arrayListOf("short"),
     ): Pair<SmsSender, SmsManager> {
@@ -188,17 +188,10 @@ class SmsSenderTest {
         val smsManager = mockk<SmsManager>(relaxed = true)
         every { smsManager.divideMessage(any()) } returns parts
 
-        // Wrap context so getSystemService(SmsManager) returns our mock.
-        val wrapped = object : android.content.ContextWrapper(app) {
-            override fun <T : Any?> getSystemService(serviceClass: Class<T>): T {
-                if (serviceClass == SmsManager::class.java) {
-                    @Suppress("UNCHECKED_CAST")
-                    return smsManager as T
-                }
-                return super.getSystemService(serviceClass)
-            }
+        val sender = SmsSender(app, dao, clock).apply {
+            smsManagerProvider = { smsManager }
         }
-        return SmsSender(wrapped, dao, clock) to smsManager
+        return sender to smsManager
     }
 
     /** In-test fake DAO — captures inserts + status updates without spinning a Room DB. */
