@@ -1,9 +1,45 @@
-# Mamy (working code-name)
+# MamY (working code-name)
 
 App Android always-on qui transforme le debrief vocal post-1:1 en mémoire vivante par employé, pour managers de 30 à 100 personnes.
 
 ## Statut
-**2026-05-02** — Brainstorm / design phase. Voir [docs/brainstorm/](docs/brainstorm/).
+**2026-05-04** — V1 alpha shipped. Wave 1 (P1-P9) merged on `main`. Wave 2
+P8 signing pipeline live: signed APK + GitHub Releases workflow ready.
+
+## Install (alpha sideload)
+
+> **Pre-release alpha.** Sideload-only for the moment. No Play Store yet.
+
+### What testers need
+
+1. An **Android 9+ device** (API 28+, ARM64 strongly recommended).
+2. A free **Picovoice AccessKey** from <https://console.picovoice.ai/>.
+3. Trained `mamy_en.ppn` + `mamy_fr.ppn` files (Picovoice Console > Wake Word).
+4. An **Anthropic Claude API key** (`sk-ant-...`) — bring-your-own-key, no MamY
+   server in the loop. Get one at <https://console.anthropic.com/>.
+
+### Step-by-step
+
+1. Open **<https://github.com/sxc3030-eng/mamy/releases/latest>** on your
+   Android device (URL placeholder — replace with the real repo).
+2. Tap `app-release.apk` to download.
+3. When Android prompts "For your security, your phone is not allowed to install
+   unknown apps from this source": tap **Settings** > toggle **Allow from this
+   source** > back > tap the APK again.
+4. Tap **Install**, then **Open**.
+5. Walk through the **7-step onboarding**: mic + notification permissions →
+   wake-word setup → Picovoice key → Claude API key → done.
+6. Drop your `mamy_en.ppn` + `mamy_fr.ppn` into `Documents/MamY/wakeword/` (use
+   any file manager, or use the in-app prompt).
+7. Test wake-word: say "MamY" → expect a haptic + chime within ~1 s.
+8. Run the [smoke checklist](docs/SMOKE_CHECKLIST.md) to validate your install.
+
+### Reporting issues
+
+File issues at <https://github.com/sxc3030-eng/mamy/issues> with:
+- Device model + Android version
+- Failed scenario number from `docs/SMOKE_CHECKLIST.md`
+- Logs from Settings > Logs > Share (no PII / no audio is logged)
 
 ## Pitch
 Un manager de 30-100 personnes finit son 1:1 en salle de réu, marche dans le corridor, parle 60-90 sec à son téléphone (« *Mamy, prends note...* »), et l'app structure tout par employé : état émotionnel, promesses faites des deux côtés, actions à suivre. Avant chaque 1:1 suivant, briefing vocal de 30 sec sur ce qu'il faut savoir. Promesses qui dérapent → relance auto.
