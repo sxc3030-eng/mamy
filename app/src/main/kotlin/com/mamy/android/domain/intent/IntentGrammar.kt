@@ -84,11 +84,16 @@ object IntentGrammar {
 
     /**
      * "MamY text <who> that <body>", "MamY send (a) text/sms to <who> : <body>",
-     * "MamY text <who> saying <body>". Named groups : `who`, `body`.
+     * "MamY send <who> a text saying <body>", "MamY text <who> saying <body>".
+     * Named groups : `who`, `body`.
      */
     val TEXT_TO_EN: Regex = Regex(
-        pattern = "^MamY,?\\s+(?:text|send\\s+(?:a\\s+)?(?:text|sms)\\s+to)\\s+" +
-            "(?:to\\s+)?(?<who>[\\w\\-']+(?:\\s+[\\w\\-']+)?)" +
+        pattern = "^MamY,?\\s+" +
+            "(?:" +
+                "text\\s+(?<who1>[\\w\\-']+(?:\\s+[\\w\\-']+)?)" +
+                "|send\\s+(?:a\\s+)?(?:text|sms)\\s+to\\s+(?<who2>[\\w\\-']+(?:\\s+[\\w\\-']+)?)" +
+                "|send\\s+(?<who3>[\\w\\-']+(?:\\s+[\\w\\-']+)?)\\s+a\\s+(?:text|sms)" +
+            ")" +
             "\\s+(?:that\\s+|saying\\s+|:\\s*|,\\s*)" +
             "(?<body>.+)\$",
         options = IGNORE,
@@ -104,8 +109,18 @@ object IntentGrammar {
      */
     fun matchTextTo(transcript: String): Pair<String, String>? {
         val trimmed = transcript.trim()
-        val match = TEXT_TO_FR.find(trimmed) ?: TEXT_TO_EN.find(trimmed) ?: return null
-        val who = match.groups["who"]?.value?.trim().orEmpty()
+        val frMatch = TEXT_TO_FR.find(trimmed)
+        val enMatch = TEXT_TO_EN.find(trimmed)
+        val match = frMatch ?: enMatch ?: return null
+        val who = if (match === frMatch) {
+            match.groups["who"]?.value?.trim().orEmpty()
+        } else {
+            // EN regex routes through one of three alternation branches.
+            (match.groups["who1"]?.value
+                ?: match.groups["who2"]?.value
+                ?: match.groups["who3"]?.value
+                ).orEmpty().trim()
+        }
         val body = match.groups["body"]?.value?.trim().orEmpty()
         if (who.isEmpty() || who.length > 50) return null
         if (body.length < 3 || body.length > 320) return null

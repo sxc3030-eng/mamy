@@ -107,5 +107,6 @@ class VoiceConfirmListenerTest {
         private val canned: String?,
     ) : VoiceConfirmListener(context) {
         override suspend fun recognizeOnce(locale: Locale): String? = canned
+        override fun isRecognitionAvailable(): Boolean = true
     }
 }

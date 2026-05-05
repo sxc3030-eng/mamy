@@ -45,7 +45,7 @@ open class VoiceConfirmListener @Inject constructor(
         timeoutMs: Long = DEFAULT_TIMEOUT_MS,
         locale: Locale = Locale.FRENCH,
     ): ConfirmResult {
-        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+        if (!isRecognitionAvailable()) {
             return ConfirmResult.Cancelled
         }
         val raw = withTimeoutOrNullSafe(timeoutMs) {
@@ -54,6 +54,10 @@ open class VoiceConfirmListener @Inject constructor(
 
         return classify(raw)
     }
+
+    /** Test seam : production checks SpeechRecognizer.isRecognitionAvailable. */
+    protected open fun isRecognitionAvailable(): Boolean =
+        SpeechRecognizer.isRecognitionAvailable(context)
 
     /** Pure classifier exposed for tests : matches against the CONFIRM / CANCEL regexes. */
     fun classify(utterance: String): ConfirmResult {
