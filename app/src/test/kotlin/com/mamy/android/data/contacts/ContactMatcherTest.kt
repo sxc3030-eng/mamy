@@ -84,7 +84,7 @@ class ContactMatcherTest {
 
         val res = matcher.findByName("Jimi")
 
-        assertTrue("Expected fuzzy match Jimi → Jimmy, got $res", res is MatchResult.Single)
+        assertTrue(res is MatchResult.Single, "Expected fuzzy match Jimi -> Jimmy, got $res")
     }
 
     @Test
@@ -118,10 +118,11 @@ class ContactMatcherTest {
     @Test
     fun `Levenshtein helper computes small edit distances`() {
         assertEquals(0, levenshtein("jimmy", "jimmy", 5))
-        assertEquals(1, levenshtein("jimmy", "jimi", 5)) // remove 'm', swap 'y'->'i' = 2 — actually
-        // Jimmy (5) vs Jimi (4) — subst y→i + delete m = 2 edits.
+        // Jimmy (5) vs Jimi (4) — subst y->i + delete m = 2 edits.
         assertEquals(2, levenshtein("jimmy", "jimi", 5))
-        // Bound triggers early bail when length diff exceeds bound.
+        // One-edit case: insert.
+        assertEquals(1, levenshtein("kitten", "kittens", 5))
+        // Bound triggers early bail when length diff exceeds bound -> returns maxDistance + 1.
         assertEquals(3, levenshtein("a", "abcd", 2))
     }
 
