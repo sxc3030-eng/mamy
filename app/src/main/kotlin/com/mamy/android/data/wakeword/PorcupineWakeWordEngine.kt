@@ -1,19 +1,23 @@
 package com.mamy.android.data.wakeword
 
+import ai.picovoice.porcupine.Porcupine
 import ai.picovoice.porcupine.PorcupineManager
 import ai.picovoice.porcupine.PorcupineManagerCallback
 import android.content.Context
 import android.util.Log
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * V1.5 alpha — uses Picovoice's built-in `JARVIS` keyword (no `.ppn` asset needed).
+ * The custom `MamY` keyword path via [WakeWordModelResolver] is preserved in the
+ * codebase for V1.0 when we own a Picovoice org and ship a per-locale `.ppn`.
+ */
 @Singleton
 class PorcupineWakeWordEngine @Inject constructor(
     private val context: Context,
-    private val resolver: WakeWordModelResolver,
     private val accessKeyProvider: () -> String,
-    private val localeProvider: () -> Locale,
+    private val keywordProvider: () -> Porcupine.BuiltInKeyword = { Porcupine.BuiltInKeyword.JARVIS },
 ) : WakeWordEngine {
 
     @Volatile private var manager: PorcupineManager? = null
@@ -27,17 +31,17 @@ class PorcupineWakeWordEngine @Inject constructor(
         val accessKey = accessKeyProvider().also {
             require(it.isNotBlank()) { "Picovoice access key missing" }
         }
-        val keywordPath = resolver.resolveKeywordPath(localeProvider())
+        val keyword = keywordProvider()
         val callback = PorcupineManagerCallback { _ -> listener.onWakeWordDetected() }
 
         manager = PorcupineManager.Builder()
             .setAccessKey(accessKey)
-            .setKeywordPath(keywordPath)
+            .setKeyword(keyword)
             .setSensitivity(sensitivity.porcupineFloat)
             .build(context, callback)
             .also { it.start() }
         running = true
-        Log.i(TAG, "Porcupine started, keyword=$keywordPath sens=${sensitivity.porcupineFloat}")
+        Log.i(TAG, "Porcupine started, keyword=$keyword sens=${sensitivity.porcupineFloat}")
     }
 
     override fun stop() {

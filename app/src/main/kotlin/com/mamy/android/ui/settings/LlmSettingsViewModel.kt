@@ -53,7 +53,8 @@ class LlmSettingsViewModel @Inject constructor(
             LlmProviderId.CLAUDE -> SettingsRepository.LlmProvider.CLAUDE
             LlmProviderId.OPENAI -> SettingsRepository.LlmProvider.OPENAI
             LlmProviderId.GEMINI -> SettingsRepository.LlmProvider.GEMINI
-            else -> SettingsRepository.LlmProvider.CLAUDE
+            LlmProviderId.OLLAMA -> SettingsRepository.LlmProvider.OLLAMA
+            else -> SettingsRepository.LlmProvider.OLLAMA
         }
         viewModelScope.launch { settings.setSelectedLlmProvider(mapped) }
     }

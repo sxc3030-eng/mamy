@@ -21,7 +21,7 @@ class SettingsRepository(
 ) {
 
     enum class Language { SYSTEM, EN, FR }
-    enum class LlmProvider { CLAUDE, OPENAI, GEMINI }
+    enum class LlmProvider { CLAUDE, OPENAI, GEMINI, OLLAMA }
     enum class PrivacyMode { STANDARD, STRICT, HYBRID_REDACTION }
 
     val languageFlow: Flow<Language> = dataStore.data.map { prefs ->
@@ -33,7 +33,7 @@ class SettingsRepository(
     }
 
     val selectedLlmProviderFlow: Flow<LlmProvider> = dataStore.data.map { prefs ->
-        prefs[KEY_LLM_PROVIDER]?.let(::safeProvider) ?: LlmProvider.CLAUDE
+        prefs[KEY_LLM_PROVIDER]?.let(::safeProvider) ?: LlmProvider.OLLAMA
     }
 
     val privacyModeFlow: Flow<PrivacyMode> = dataStore.data.map { prefs ->
@@ -125,7 +125,7 @@ class SettingsRepository(
         runCatching { Language.valueOf(raw) }.getOrDefault(Language.SYSTEM)
 
     private fun safeProvider(raw: String): LlmProvider =
-        runCatching { LlmProvider.valueOf(raw) }.getOrDefault(LlmProvider.CLAUDE)
+        runCatching { LlmProvider.valueOf(raw) }.getOrDefault(LlmProvider.OLLAMA)
 
     private fun safePrivacy(raw: String): PrivacyMode =
         runCatching { PrivacyMode.valueOf(raw) }.getOrDefault(PrivacyMode.STANDARD)

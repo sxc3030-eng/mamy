@@ -10,6 +10,7 @@ object LlmProviderId {
     const val CLAUDE = "claude"
     const val OPENAI = "openai"
     const val GEMINI = "gemini"
+    const val OLLAMA = "ollama"
 }
 
 data class LlmRequest(

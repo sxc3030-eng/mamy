@@ -62,9 +62,23 @@ class SettingsRepositoryTest {
     }
 
     @Test
-    fun `default selected llm provider is claude`() = runTest {
+    fun `default selected llm provider is ollama`() = runTest {
+        repo.selectedLlmProviderFlow.test {
+            assertEquals(SettingsRepository.LlmProvider.OLLAMA, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `setSelectedLlmProvider persists ollama and other values`() = runTest {
+        repo.setSelectedLlmProvider(SettingsRepository.LlmProvider.CLAUDE)
         repo.selectedLlmProviderFlow.test {
             assertEquals(SettingsRepository.LlmProvider.CLAUDE, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+        repo.setSelectedLlmProvider(SettingsRepository.LlmProvider.OLLAMA)
+        repo.selectedLlmProviderFlow.test {
+            assertEquals(SettingsRepository.LlmProvider.OLLAMA, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -1,0 +1,16 @@
+[Unit]
+Description=Cloudflared quick tunnel for MamY (Ollama-compatible API)
+After=network-online.target mamy-proxy.service
+Wants=network-online.target mamy-proxy.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/cloudflared tunnel --url http://127.0.0.1:11435 --http-host-header 127.0.0.1:11435 --metrics 127.0.0.1:20242 --no-autoupdate
+Restart=on-failure
+RestartSec=10s
+User=optimus
+StandardOutput=append:/var/log/cloudflared-mamy.log
+StandardError=append:/var/log/cloudflared-mamy.log
+
+[Install]
+WantedBy=multi-user.target
