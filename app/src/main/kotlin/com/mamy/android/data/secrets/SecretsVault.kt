@@ -27,9 +27,17 @@ class SecretsVault(
 
     fun putSecret(key: String, value: String) {
         require(key.isNotBlank()) { "key must not be blank" }
-        val iv = ByteArray(GCM_IV_BYTES).also { random.nextBytes(it) }
+        // Android Keystore key was created with setRandomizedEncryptionRequired(true)
+        // so the caller MUST NOT pass an IV at init() — Android generates a random
+        // IV internally and exposes it via cipher.iv. Passing GCMParameterSpec here
+        // throws InvalidAlgorithmParameterException("Caller-provided IV not
+        // permitted") on Android 12+ (strictly enforced on Android 14/15/16).
         val cipher = Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.ENCRYPT_MODE, keystoreHelper.getOrCreateMasterKey(), GCMParameterSpec(GCM_TAG_BITS, iv))
+            init(Cipher.ENCRYPT_MODE, keystoreHelper.getOrCreateMasterKey())
+        }
+        val iv = cipher.iv
+        require(iv.size == GCM_IV_BYTES) {
+            "Expected ${GCM_IV_BYTES}-byte IV from keystore, got ${iv.size}"
         }
         val cipherText = cipher.doFinal(value.toByteArray(Charsets.UTF_8))
         val blob = iv + cipherText
