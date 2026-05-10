@@ -1,0 +1,117 @@
+═══════════════════════════════════════════════════════════
+  MamY v0.1.0-alpha — Secrétaire vocale Android
+  Build : 2026-05-03 · Version : 0.1.0-alpha
+═══════════════════════════════════════════════════════════
+
+🎯 C'est quoi MamY ?
+─────────────────────
+Une app Android qui te permet de :
+  - Dire « MamY, prends note... » → ton debrief vocal devient des
+    notes structurées par employé (mémoire managériale).
+  - Dire « MamY, ma journée » → briefing vocal du jour.
+  - Dire « MamY, texte à Jimmy que c'est bon » → SMS auto envoyé
+    à Jimmy après confirmation vocale, mains libres.
+
+Cible : managers d'équipes 30-100 personnes. Voice-first.
+
+
+📲 Installation (5 min)
+────────────────────────
+
+1. SUR TON TÉLÉPHONE ANDROID :
+   - Va dans Réglages → Sécurité (ou Confidentialité)
+   - Active « Sources inconnues » ou « Autoriser depuis Chrome »
+
+2. TÉLÉCHARGE le fichier MamY-v0.1.0-alpha.apk
+
+3. TAP sur l'APK → Install → Open
+   - L'app s'appelle « MamY » avec une icône lettre M verte
+
+4. ONBOARDING — l'app te guide en 7 étapes
+
+
+🔑 Setup essentiel (avant que MamY marche)
+──────────────────────────────────────────────
+
+A) PICOVOICE (le wake-word « MamY »)
+   1. Crée compte gratuit : https://console.picovoice.ai/
+   2. Section Wake Word → Train Wake Word
+   3. Phrase : MamY · Language : English → Train · Download le .ppn
+   4. Refais avec Language : French → 2e .ppn
+   5. Renomme les fichiers : mamy_en.ppn et mamy_fr.ppn
+   6. Setings → Phone → drop-les dans le dossier MamY/wakeword/
+      (ou via cable USB sur PC : /Android/data/com.mamy.android/files/wakeword/)
+   7. Settings Picovoice → copie ton AccessKey
+   8. Onboarding step 2 → entre l'AccessKey
+
+B) CLÉ API LLM (pour structurer tes debriefs)
+   1. Compte Anthropic Claude : https://console.anthropic.com/
+      (ou OpenAI : https://platform.openai.com/)
+   2. Settings → API Keys → Create Key → copie
+   3. Onboarding step 3 → entre la clé
+
+
+🎤 Premières commandes vocales à essayer
+────────────────────────────────────────────
+
+  « MamY, prends note. Marie va mieux, on a parlé du projet X
+    qui doit être livré vendredi. »
+    → l'app structure : personne, action, contexte, deadline.
+
+  « MamY, ma journée »
+    → briefing vocal de tes 1:1s du jour (si calendar connecté).
+
+  « MamY, mes actions ouvertes »
+    → liste vocale de ce qui te reste à faire.
+
+  « MamY, texte à <prénom contact> que <ton message> »
+    → SMS direct au contact, après confirmation vocale (« oui »/« non »).
+
+
+💸 Coût
+────────
+- L'app est gratuite (alpha test, version perso)
+- Tu paies SEULEMENT ta clé Anthropic/OpenAI à l'usage (~$0.01-0.05/jour
+  d'usage typique)
+- Picovoice : free tier OK pour usage perso
+
+
+🐛 Problèmes connus alpha
+─────────────────────────
+- Pas testé sur tous les téléphones Android. Pixel/Samsung récents = OK.
+- Si l'app crash au lancement → désinstalle + reinstalle, redémarre tel.
+- Onboarding step 1 (permissions) : si tu skip ou refuses, l'app marchera
+  pas correctement. Ré-active dans Réglages → Apps → MamY → Permissions.
+- Wake-word peut louper le 1er « MamY » après long sommeil → dis-le 2 fois.
+- Confirmation SMS : si trop de bruit ambiant, parfois ne capte pas
+  « oui »/« non » → annule par défaut. Réessaye en silence.
+
+
+📞 Feedback / Bugs
+──────────────────
+Texte-moi (Simon) ou écris à : <ton-email-ici>
+
+Mentionne :
+  - Modèle de tel (ex : Pixel 7, Samsung S22)
+  - Version Android (Settings → About)
+  - Étape où ça bloque
+  - Screenshot si possible
+
+
+🔒 Privacy
+──────────
+- Audio : jamais envoyé sur internet, jamais stocké sur disque.
+  Whisper transcrit localement sur ton tel.
+- Texte structuré : envoyé à Claude/OpenAI (ta clé) pour analyse,
+  puis stocké chiffré dans la DB locale du tel.
+- SMS : envoyés via SmsManager Android natif. MamY ne lit AUCUN
+  SMS reçu. Send-only.
+- Contacts : lus localement uniquement, jamais envoyés sur internet.
+
+Mode strict (Settings → Privacy → Strict) : aucun appel cloud
+pour le SMS extraction si tu veux maximum privacy.
+
+
+SHA256 de l'APK pour vérification :
+ee7ed3b2e6b6b12341867bb1ab3e860c33d97da4f4fb78a2247143e00187c216
+═══════════════════════════════════════════════════════════

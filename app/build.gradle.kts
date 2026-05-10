@@ -20,6 +20,18 @@ val signingProps = Properties().apply {
 val hasReleaseSigning = signingProps.getProperty("storeFile")?.isNotBlank() == true
         && rootProject.file(signingProps.getProperty("storeFile") ?: "").exists()
 
+// Read alpha config (Ollama tunnel URL + Picovoice access key) from local.properties.
+// Falls back to baked-in defaults when absent so CI builds still succeed.
+val localPropsFile = rootProject.file("local.properties")
+val localProps = Properties().apply {
+    if (localPropsFile.exists()) {
+        localPropsFile.inputStream().use { load(it) }
+    }
+}
+val ollamaBaseUrl: String = localProps.getProperty("ollama.base.url")
+    ?: "https://friends-muscle-warriors-formula.trycloudflare.com"
+val picovoiceAccessKey: String = localProps.getProperty("picovoice.access.key") ?: ""
+
 android {
     namespace = "com.mamy.android"
     compileSdk = 35
@@ -29,8 +41,8 @@ android {
         applicationId = "com.mamy.android"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 15
+        versionName = "0.4.4-alpha"
 
         testInstrumentationRunner = "com.mamy.android.MamYTestRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -44,6 +56,9 @@ android {
                 arguments += listOf("-DANDROID_STL=c++_static")
             }
         }
+
+        buildConfigField("String", "OLLAMA_BASE_URL", "\"$ollamaBaseUrl\"")
+        buildConfigField("String", "PICOVOICE_ACCESS_KEY", "\"$picovoiceAccessKey\"")
     }
 
     externalNativeBuild {
