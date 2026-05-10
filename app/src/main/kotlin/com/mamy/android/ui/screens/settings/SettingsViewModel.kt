@@ -2,6 +2,8 @@ package com.mamy.android.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mamy.android.data.llm.LlmProviderFactory
+import com.mamy.android.data.llm.LlmProviderId
 import com.mamy.android.data.llm.cost.LlmCostTracker
 import com.mamy.android.data.settings.CalendarSettings
 import com.mamy.android.data.settings.SettingsRepository
@@ -9,13 +11,24 @@ import com.mamy.android.data.settings.SettingsRepository.Language
 import com.mamy.android.data.settings.SettingsRepository.LlmProvider
 import com.mamy.android.data.settings.SettingsRepository.PrivacyMode
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.YearMonth
 import javax.inject.Inject
+
+/** Result emitted by [SettingsViewModel.testProviderConnection] for the snackbar. */
+sealed interface ProviderTestResult {
+    data object Loading : ProviderTestResult
+    data class Ok(val providerName: String) : ProviderTestResult
+    data class Failed(val providerName: String, val reason: String) : ProviderTestResult
+}
 
 /**
  * ViewModel backing the modular [SettingsScreen]. Reads slice-flows from
@@ -32,7 +45,40 @@ class SettingsViewModel @Inject constructor(
     private val repo: SettingsRepository,
     private val calendarSettings: CalendarSettings,
     costTracker: LlmCostTracker,
+    private val llmFactory: LlmProviderFactory,
 ) : ViewModel() {
+
+    private val _providerTestEvents = MutableSharedFlow<ProviderTestResult>(extraBufferCapacity = 4)
+    val providerTestEvents: SharedFlow<ProviderTestResult> = _providerTestEvents.asSharedFlow()
+
+    /** Test the currently selected LLM provider. Emits Loading → Ok | Failed. */
+    fun testProviderConnection() = viewModelScope.launch {
+        val provider = repo.selectedLlmProviderFlow.first()
+        val id = when (provider) {
+            LlmProvider.CLAUDE -> LlmProviderId.CLAUDE
+            LlmProvider.OPENAI -> LlmProviderId.OPENAI
+            LlmProvider.GEMINI -> LlmProviderId.GEMINI
+            LlmProvider.OLLAMA -> LlmProviderId.OLLAMA
+        }
+        _providerTestEvents.emit(ProviderTestResult.Loading)
+        val name = id
+        runCatching { llmFactory.byId(id).testKey() }
+            .fold(
+                onSuccess = { result ->
+                    if (result.isSuccess) {
+                        _providerTestEvents.emit(ProviderTestResult.Ok(name))
+                    } else {
+                        val msg = result.exceptionOrNull()?.message?.take(120) ?: "unknown error"
+                        _providerTestEvents.emit(ProviderTestResult.Failed(name, msg))
+                    }
+                },
+                onFailure = { t ->
+                    _providerTestEvents.emit(
+                        ProviderTestResult.Failed(name, t.message?.take(120) ?: "exception"),
+                    )
+                },
+            )
+    }
 
     /**
      * 11 source flows combine into one [SettingsUiState]. The 5-typed-arg [combine]

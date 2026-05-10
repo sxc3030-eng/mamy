@@ -1,5 +1,6 @@
 package com.mamy.android.ui.screens.reports
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,10 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -28,12 +33,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamy.android.R
+import com.mamy.android.service.MamYListenerService
 import java.time.Duration
 import java.time.Instant
 
@@ -44,15 +51,26 @@ import java.time.Instant
 @Composable
 fun ReportsListRoute(
     viewModel: ReportsListViewModel = hiltViewModel(),
+    todayViewModel: TodayAgendaViewModel = hiltViewModel(),
     onPersonClick: (PersonRow) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val today by todayViewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     ReportsListScreen(
         state = state,
+        todayState = today,
         onSortChange = viewModel::setSort,
         onQueryChange = viewModel::setQuery,
         onToggleHideUnmatched = viewModel::toggleHideUnmatched,
         onPersonClick = onPersonClick,
+        onRecord = {
+            val intent = Intent(context, MamYListenerService::class.java).apply {
+                action = MamYListenerService.ACTION_TRIGGER_CAPTURE
+            }
+            // startForegroundService is required from a foreground activity on Android 12+
+            context.startForegroundService(intent)
+        },
     )
 }
 
@@ -68,14 +86,29 @@ fun ReportsListRoute(
 @Composable
 fun ReportsListScreen(
     state: ReportsListUiState,
+    todayState: TodayAgendaState = TodayAgendaState(),
     onSortChange: (ReportsSort) -> Unit,
     onQueryChange: (String) -> Unit,
     onToggleHideUnmatched: () -> Unit,
     onPersonClick: (PersonRow) -> Unit,
+    onRecord: () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(R.string.reports_title)) })
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = onRecord,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.PlayArrow,
+                        contentDescription = stringResource(R.string.reports_record_cd),
+                    )
+                },
+                text = { Text(stringResource(R.string.reports_record_label)) },
+                modifier = Modifier.testTag("reports-fab-record"),
+            )
         },
     ) { padding ->
         Column(
@@ -86,6 +119,9 @@ fun ReportsListScreen(
                 .testTag("reports-root"),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
+            if (todayState.hasContent) {
+                TodayAgendaCard(todayState)
+            }
             OutlinedTextField(
                 value = state.query,
                 onValueChange = onQueryChange,
@@ -120,13 +156,7 @@ fun ReportsListScreen(
             }
 
             if (state.persons.isEmpty()) {
-                Text(
-                    stringResource(R.string.reports_empty),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .padding(vertical = 24.dp)
-                        .testTag("reports-empty"),
-                )
+                EmptyReportsState()
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(state.persons, key = { it.id }) { p ->
@@ -135,6 +165,97 @@ fun ReportsListScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * Compact "today" agenda card shown above the search bar on the Reports screen.
+ * Pulls from the device calendar via [TodayAgendaViewModel] — visible only when
+ * the user has granted READ_CALENDAR and there is at least one event today.
+ */
+@Composable
+private fun TodayAgendaCard(state: TodayAgendaState) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .testTag("reports-today-card"),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.reports_today_title, state.count),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            state.previews.take(2).forEach { line ->
+                Text(line, style = MaterialTheme.typography.bodySmall)
+            }
+            if (state.count > 2) {
+                Text(
+                    stringResource(R.string.reports_today_more, state.count - 2),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Inviting empty-state for fresh installs. Lists 3 example voice patterns
+ * users can try with the FAB Record button so the screen does not feel
+ * broken on first launch.
+ */
+@Composable
+private fun EmptyReportsState() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 32.dp, bottom = 16.dp)
+            .testTag("reports-empty"),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            stringResource(R.string.reports_empty_title),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            stringResource(R.string.reports_empty_subtitle),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    stringResource(R.string.reports_empty_examples_title),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Text(
+                    "• " + stringResource(R.string.reports_empty_example_1),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Text(
+                    "• " + stringResource(R.string.reports_empty_example_2),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                Text(
+                    "• " + stringResource(R.string.reports_empty_example_3),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+        Text(
+            stringResource(R.string.reports_empty_footer),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 

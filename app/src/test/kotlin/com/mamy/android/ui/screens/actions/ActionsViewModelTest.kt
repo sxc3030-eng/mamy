@@ -1,9 +1,11 @@
 package com.mamy.android.ui.screens.actions
 
 import com.mamy.android.data.db.dao.ActionDao
+import com.mamy.android.data.db.dao.NoteDao
 import com.mamy.android.data.db.dao.PersonDao
 import com.mamy.android.data.db.entity.ActionEntity
 import com.mamy.android.data.db.entity.PersonEntity
+import com.mamy.android.data.tts.TtsService
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -28,6 +30,8 @@ class ActionsViewModelTest {
 
     private lateinit var actionDao: ActionDao
     private lateinit var personDao: PersonDao
+    private lateinit var noteDao: NoteDao
+    private lateinit var tts: TtsService
 
     private val personId = UUID.randomUUID()
     private val person = PersonEntity(
@@ -59,6 +63,8 @@ class ActionsViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         actionDao = mockk(relaxed = true)
         personDao = mockk(relaxed = true)
+        noteDao = mockk(relaxed = true)
+        tts = mockk(relaxed = true)
         coEvery { actionDao.getAll() } returns emptyList()
         coEvery { personDao.getById(personId) } returns person
     }
@@ -70,7 +76,7 @@ class ActionsViewModelTest {
 
     @Test
     fun `default filter is Open`() = runTest {
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         assertEquals(ActionsFilter.Open, vm.state.value.filter)
         assertFalse(vm.state.value.isLoading)
@@ -81,7 +87,7 @@ class ActionsViewModelTest {
         val open = action(description = "open task")
         val done = action(status = "done", description = "done task", doneAt = Instant.now())
         coEvery { actionDao.getAll() } returns listOf(open, done)
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         val descs = vm.state.value.actions.map { it.action.description }
         assertEquals(listOf("open task"), descs)
@@ -92,7 +98,7 @@ class ActionsViewModelTest {
         val open = action(description = "open task")
         val done = action(status = "done", description = "done task", doneAt = Instant.now())
         coEvery { actionDao.getAll() } returns listOf(open, done)
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         vm.setFilter(ActionsFilter.Done)
         advanceUntilIdle()
         val descs = vm.state.value.actions.map { it.action.description }
@@ -104,7 +110,7 @@ class ActionsViewModelTest {
         val open = action(description = "open task")
         val done = action(status = "done", description = "done task", doneAt = Instant.now())
         coEvery { actionDao.getAll() } returns listOf(open, done)
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         vm.setFilter(ActionsFilter.All)
         advanceUntilIdle()
         assertEquals(2, vm.state.value.actions.size)
@@ -114,7 +120,7 @@ class ActionsViewModelTest {
     fun `linked person name is resolved client side`() = runTest {
         val a = action(description = "Email Alice", linkedPersonId = personId)
         coEvery { actionDao.getAll() } returns listOf(a)
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         val row = vm.state.value.actions.single()
         assertEquals("Alice", row.linkedPersonName)
@@ -125,7 +131,7 @@ class ActionsViewModelTest {
         val a = action(description = "Email", linkedPersonId = UUID.randomUUID())
         coEvery { actionDao.getAll() } returns listOf(a)
         coEvery { personDao.getById(any()) } returns null
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         val row = vm.state.value.actions.single()
         assertEquals(null, row.linkedPersonName)
@@ -133,7 +139,7 @@ class ActionsViewModelTest {
 
     @Test
     fun `markDone calls dao with current instant`() = runTest {
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         val id = UUID.randomUUID()
         vm.markDone(id)
         advanceUntilIdle()
@@ -142,7 +148,7 @@ class ActionsViewModelTest {
 
     @Test
     fun `setFilter updates state`() = runTest {
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         vm.setFilter(ActionsFilter.Done)
         advanceUntilIdle()
@@ -156,7 +162,7 @@ class ActionsViewModelTest {
         val today = action(description = "today", deadline = now)
         val tomorrow = action(description = "tomorrow", deadline = now.plusSeconds(86_400))
         coEvery { actionDao.getAll() } returns listOf(tomorrow, noDeadline, today)
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         assertEquals(
             listOf("today", "tomorrow", "no deadline"),
@@ -166,7 +172,7 @@ class ActionsViewModelTest {
 
     @Test
     fun `loading state flips false after first emit`() = runTest {
-        val vm = ActionsViewModel(actionDao, personDao)
+        val vm = ActionsViewModel(actionDao, personDao, noteDao, tts)
         advanceUntilIdle()
         assertFalse(vm.state.value.isLoading)
         assertTrue(vm.state.value.actions.isEmpty())

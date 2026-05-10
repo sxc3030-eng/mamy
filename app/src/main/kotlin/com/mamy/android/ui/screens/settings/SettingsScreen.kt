@@ -4,29 +4,42 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -51,8 +64,26 @@ fun SettingsRoute(
     onOpenSmsAuditLog: () -> Unit = onOpenNetworkLog,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val ctx = LocalContext.current
+
+    // Collect provider-test events and surface them as a snackbar
+    LaunchedEffect(viewModel) {
+        viewModel.providerTestEvents.collect { ev ->
+            val msg = when (ev) {
+                ProviderTestResult.Loading -> ctx.getString(R.string.settings_byok_test_loading)
+                is ProviderTestResult.Ok ->
+                    ctx.getString(R.string.settings_byok_test_ok, ev.providerName)
+                is ProviderTestResult.Failed ->
+                    ctx.getString(R.string.settings_byok_test_failed, ev.providerName, ev.reason)
+            }
+            snackbarHostState.showSnackbar(msg)
+        }
+    }
+
     SettingsScreen(
         state = state,
+        snackbarHostState = snackbarHostState,
         actions = SettingsActions(
             onLanguage = viewModel::setLanguage,
             onBriefingTime = { h, m -> viewModel.setDailyBriefingTime(h, m) },
@@ -70,6 +101,7 @@ fun SettingsRoute(
             onOpenSmsAuditLog = onOpenSmsAuditLog,
             onOpenNetworkLog = onOpenNetworkLog,
             onOpenData = onOpenData,
+            onTestByokConnection = viewModel::testProviderConnection,
         ),
     )
 }
@@ -79,9 +111,11 @@ fun SettingsRoute(
 fun SettingsScreen(
     state: SettingsUiState,
     actions: SettingsActions,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.screen_settings_title)) }) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = Modifier.testTag("settings-screen"),
     ) { padding ->
         Column(
@@ -179,9 +213,13 @@ private fun ExpandableSection(
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun GeneralSection(state: SettingsUiState, actions: SettingsActions) {
     Text(stringResource(R.string.settings_lang_label), style = MaterialTheme.typography.labelLarge)
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
         LanguageButton(state, actions, Language.SYSTEM, R.string.settings_lang_system)
         LanguageButton(state, actions, Language.EN, R.string.settings_lang_en)
         LanguageButton(state, actions, Language.FR, R.string.settings_lang_fr)
@@ -221,21 +259,59 @@ private fun LanguageButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ByokSection(state: SettingsUiState, actions: SettingsActions) {
     Text(stringResource(R.string.settings_byok_provider_label), style = MaterialTheme.typography.labelLarge)
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        ProviderButton(state, actions, LlmProvider.CLAUDE, R.string.settings_byok_claude)
-        ProviderButton(state, actions, LlmProvider.OPENAI, R.string.settings_byok_openai)
-        ProviderButton(state, actions, LlmProvider.GEMINI, R.string.settings_byok_gemini)
+        ProviderChip(state, actions, LlmProvider.OLLAMA, R.string.settings_provider_ollama)
+        ProviderChip(state, actions, LlmProvider.CLAUDE, R.string.settings_byok_claude)
+        ProviderChip(state, actions, LlmProvider.OPENAI, R.string.settings_byok_openai)
+        ProviderChip(state, actions, LlmProvider.GEMINI, R.string.settings_byok_gemini)
     }
-    Text(
-        stringResource(
-            R.string.settings_byok_key_masked,
-            state.byokKeyMasked ?: "—",
-        ),
-        modifier = Modifier.testTag("settings-byok-key-masked"),
-    )
+    if (state.provider == LlmProvider.OLLAMA) {
+        // Big green status card so users immediately see Ollama is ready, no key needed
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag("settings-byok-ollama-ready"),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+            ),
+        ) {
+            Row(
+                modifier = Modifier.padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                Column {
+                    Text(
+                        stringResource(R.string.settings_provider_ollama_ready_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                    Text(
+                        stringResource(R.string.settings_provider_ollama_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+                }
+            }
+        }
+    } else {
+        Text(
+            stringResource(
+                R.string.settings_byok_key_masked,
+                state.byokKeyMasked ?: "—",
+            ),
+            modifier = Modifier.testTag("settings-byok-key-masked"),
+        )
+    }
     OutlinedButton(
         onClick = actions.onTestByokConnection,
         modifier = Modifier.testTag("settings-byok-test"),
@@ -257,6 +333,32 @@ private fun ByokSection(state: SettingsUiState, actions: SettingsActions) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProviderChip(
+    state: SettingsUiState,
+    actions: SettingsActions,
+    target: LlmProvider,
+    labelRes: Int,
+) {
+    val selected = state.provider == target
+    FilterChip(
+        selected = selected,
+        onClick = { actions.onProvider(target) },
+        modifier = Modifier.testTag("settings-byok-${target.name.lowercase()}"),
+        label = { Text(stringResource(labelRes)) },
+        leadingIcon = if (selected) {
+            { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+        } else null,
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+    )
+}
+
+// kept here only for the test-anchor IDs and the legacy preview path
 @Composable
 private fun ProviderButton(
     state: SettingsUiState,
@@ -317,6 +419,7 @@ private fun PrivacySection(state: SettingsUiState, actions: SettingsActions) {
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun CalendarSection(state: SettingsUiState, actions: SettingsActions) {
     Text(
         if (state.calendarConnected)
@@ -324,7 +427,10 @@ private fun CalendarSection(state: SettingsUiState, actions: SettingsActions) {
         else
             stringResource(R.string.settings_calendar_disabled_status),
     )
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
         OutlinedButton(
             onClick = actions.onConnectCalendar,
             modifier = Modifier.testTag("settings-calendar-connect"),

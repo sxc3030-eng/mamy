@@ -1,13 +1,15 @@
 package com.mamy.android.ui.nav
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mamy.android.ui.screens.actions.ActionsRoute
+import com.mamy.android.ui.screens.calendar.CalendarRoute
 import com.mamy.android.ui.screens.data.DataRoute
+import com.mamy.android.ui.screens.notes.NotesRoute
 import com.mamy.android.ui.screens.networklog.NetworkLogRoute
 import com.mamy.android.ui.screens.onboarding.OnboardingRoute
 import com.mamy.android.ui.screens.person.PersonDetailRoute
@@ -17,9 +19,7 @@ import com.mamy.android.ui.screens.settings.SettingsRoute
 import com.mamy.android.ui.screens.sms.SmsHistoryRoute
 
 @Composable
-fun MamYNav() {
-    val navController = rememberNavController()
-
+fun MamYNav(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = Routes.ReportsList.path,
@@ -52,6 +52,12 @@ fun MamYNav() {
         }
         composable(Routes.Actions.path) {
             ActionsRoute()
+        }
+        composable(Routes.Calendar.path) {
+            CalendarRoute()
+        }
+        composable(Routes.Notes.path) {
+            NotesRoute()
         }
         composable(Routes.Settings.path) {
             SettingsRoute(

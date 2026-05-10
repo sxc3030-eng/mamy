@@ -10,6 +10,7 @@ import com.mamy.android.R
 object BriefingNotifChannels {
     const val CHANNEL_DAILY = "mamy.briefing.daily"
     const val CHANNEL_PRE_MEETING = "mamy.briefing.pre_meeting"
+    const val CHANNEL_MEETING_REMINDER = "mamy.meeting.reminder"
 
     fun ensure(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -24,7 +25,13 @@ object BriefingNotifChannels {
             context.getString(R.string.notif_channel_pre_meeting),
             NotificationManager.IMPORTANCE_LOW, // silent (vibrates by default)
         ).apply { enableVibration(true) }
+        val reminder = NotificationChannel(
+            CHANNEL_MEETING_REMINDER,
+            context.getString(R.string.notif_channel_meeting_reminder),
+            NotificationManager.IMPORTANCE_DEFAULT, // makes a sound — it's a reminder
+        ).apply { enableVibration(true) }
         nm.createNotificationChannel(daily)
         nm.createNotificationChannel(pre)
+        nm.createNotificationChannel(reminder)
     }
 }

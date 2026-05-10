@@ -1,5 +1,6 @@
 package com.mamy.android.ui.screens.settings
 
+import com.mamy.android.data.llm.LlmProviderFactory
 import com.mamy.android.data.llm.cost.LlmCostTracker
 import com.mamy.android.data.settings.CalendarSettings
 import com.mamy.android.data.settings.SettingsRepository
@@ -26,6 +27,7 @@ class SettingsViewModelTest {
     private val repo = mockk<SettingsRepository>(relaxed = true)
     private val calendarSettings = mockk<CalendarSettings>(relaxed = true)
     private val costTracker = mockk<LlmCostTracker>(relaxed = true)
+    private val llmFactory = mockk<LlmProviderFactory>(relaxed = true)
 
     private val languageFlow = MutableStateFlow(Language.SYSTEM)
     private val briefingHourFlow = MutableStateFlow(8)
@@ -61,7 +63,7 @@ class SettingsViewModelTest {
         languageFlow.value = Language.FR
         smsConfirmFlow.value = true
 
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         // Wait for the combine to resolve to a non-empty state (FR != SYSTEM default).
         val finalState = vm.state.first { it.language == Language.FR }
         assertEquals(Language.FR, finalState.language)
@@ -73,49 +75,49 @@ class SettingsViewModelTest {
 
     @Test
     fun `setSmsMasterEnabled delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setSmsMasterEnabled(true)
         coVerify { repo.setSmsMasterEnabled(true) }
     }
 
     @Test
     fun `setSmsConfirmRequired delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setSmsConfirmRequired(false)
         coVerify { repo.setSmsConfirmRequired(false) }
     }
 
     @Test
     fun `setSmsPrivacyMode delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setSmsPrivacyMode(PrivacyMode.STRICT)
         coVerify { repo.setSmsPrivacyMode(PrivacyMode.STRICT) }
     }
 
     @Test
     fun `setLanguage delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setLanguage(Language.FR)
         coVerify { repo.setLanguage(Language.FR) }
     }
 
     @Test
     fun `setPrivacyMode delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setPrivacyMode(PrivacyMode.STRICT)
         coVerify { repo.setPrivacyMode(PrivacyMode.STRICT) }
     }
 
     @Test
     fun `setWakeWordSensitivity delegates to repo`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setWakeWordSensitivity(2)
         coVerify { repo.setWakeWordSensitivity(2) }
     }
 
     @Test
     fun `setCalendarEnabled delegates to settings`() = runTest {
-        val vm = SettingsViewModel(repo, calendarSettings, costTracker)
+        val vm = SettingsViewModel(repo, calendarSettings, costTracker, llmFactory)
         vm.setCalendarEnabled(true)
         coVerify { calendarSettings.setCalendarEnabled(true) }
     }
