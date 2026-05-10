@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -32,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamy.android.R
-import com.mamy.android.ui.onboarding.contracts.OnboardingLlmProvider
 
 /**
  * Hilt-wired entry point. Resolves [OnboardingViewModel] and forwards callbacks
@@ -50,7 +46,7 @@ fun OnboardingRoute(
         onBack = viewModel::back,
         onPermissionsGranted = { viewModel.setPermissionsGranted(it) },
         onWakeWordModelSet = { key, present -> viewModel.setWakeWordModel(key, present) },
-        onTestByok = viewModel::testByok,
+        onSkipWakeWordModel = viewModel::skipWakeWordModel,
         onSmsOptIn = { optIn, perms -> viewModel.setSmsOptIn(optIn, perms) },
         onSkipSms = viewModel::skipSms,
         onConnectCalendar = viewModel::connectCalendar,
@@ -61,7 +57,7 @@ fun OnboardingRoute(
 }
 
 /**
- * Stateless 7-step onboarding screen.
+ * Stateless 6-step onboarding screen (V1.5 alpha — Byok step removed).
  *
  * Each step renders its own sub-Composable; advance/back is gated by the VM
  * state (see [OnboardingUiState]).
@@ -74,7 +70,7 @@ fun OnboardingScreen(
     onBack: () -> Unit,
     onPermissionsGranted: (Boolean) -> Unit,
     onWakeWordModelSet: (String, Boolean) -> Unit,
-    onTestByok: (OnboardingLlmProvider, String) -> Unit,
+    onSkipWakeWordModel: () -> Unit,
     onSmsOptIn: (Boolean, Boolean) -> Unit,
     onSkipSms: () -> Unit,
     onConnectCalendar: () -> Unit,
@@ -96,7 +92,7 @@ fun OnboardingScreen(
                 text = stringResource(R.string.onboarding_title),
                 style = MaterialTheme.typography.headlineMedium,
             )
-            // Progress: 1/7…7/7
+            // Progress: 1/6…6/6
             val stepIndex = state.step.ordinal + 1
             val total = OnboardingStep.values().size
             Text(
@@ -119,10 +115,7 @@ fun OnboardingScreen(
                     modelsPresent = state.wakeWordModelsPresent,
                     onAccessKeySet = onWakeWordModelSet,
                     onContinue = onNext,
-                )
-                OnboardingStep.Byok -> ByokStep(
-                    onTest = onTestByok,
-                    isLoading = state.isLoading,
+                    onSkip = onSkipWakeWordModel,
                 )
                 OnboardingStep.Sms -> SmsStep(
                     optIn = state.smsOptIn,
@@ -208,9 +201,11 @@ private fun WakeWordModelStep(
     modelsPresent: Boolean,
     onAccessKeySet: (String, Boolean) -> Unit,
     onContinue: () -> Unit,
+    onSkip: () -> Unit,
 ) {
     var key by remember { mutableStateOf("") }
-    var present by remember(modelsPresent) { mutableStateOf(modelsPresent) }
+    val present by remember(modelsPresent) { mutableStateOf(modelsPresent) }
+    val alphaKeyBaked = com.mamy.android.BuildConfig.PICOVOICE_ACCESS_KEY.isNotBlank()
 
     Column(
         modifier = Modifier.testTag("onboarding-step-wakeword-model"),
@@ -220,102 +215,50 @@ private fun WakeWordModelStep(
             stringResource(R.string.onboarding_wakeword_model_body),
             style = MaterialTheme.typography.bodyLarge,
         )
-        Text(
-            stringResource(R.string.onboarding_wakeword_model_steps),
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        OutlinedTextField(
-            value = key,
-            onValueChange = { key = it },
-            label = { Text(stringResource(R.string.onboarding_wakeword_accesskey_label)) },
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.testTag("onboarding-wakeword-accesskey"),
-        )
-        accessKeyMasked?.let {
+        if (alphaKeyBaked) {
             Text(
-                stringResource(R.string.onboarding_wakeword_accesskey_set, it),
-                style = MaterialTheme.typography.labelMedium,
+                stringResource(R.string.onboarding_wakeword_builtin_hint),
+                style = MaterialTheme.typography.bodyMedium,
             )
-        }
-        Button(
-            onClick = { onAccessKeySet(key, present) },
-            enabled = key.isNotBlank(),
-            modifier = Modifier.testTag("onboarding-btn-save-accesskey"),
-        ) {
-            Text(stringResource(R.string.onboarding_btn_save))
-        }
-        Button(
-            onClick = onContinue,
-            enabled = accessKeyMasked != null,
-            modifier = Modifier.testTag("onboarding-btn-continue"),
-        ) {
-            Text(stringResource(R.string.onboarding_btn_continue))
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ByokStep(
-    onTest: (OnboardingLlmProvider, String) -> Unit,
-    isLoading: Boolean,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    var provider by remember { mutableStateOf(OnboardingLlmProvider.Claude) }
-    var key by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier.testTag("onboarding-step-byok"),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            stringResource(R.string.onboarding_byok_body),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            OutlinedTextField(
-                readOnly = true,
-                value = provider.name,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.onboarding_byok_provider_label)) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier
-                    .menuAnchor()
-                    .testTag("onboarding-byok-provider"),
-            )
-            androidx.compose.material3.DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
+            Button(
+                onClick = onSkip,
+                modifier = Modifier.testTag("onboarding-btn-use-builtin"),
             ) {
-                OnboardingLlmProvider.values().forEach { p ->
-                    DropdownMenuItem(
-                        text = { Text(p.name) },
-                        onClick = {
-                            provider = p
-                            expanded = false
-                        },
-                    )
-                }
+                Text(stringResource(R.string.onboarding_btn_use_builtin))
             }
-        }
-        OutlinedTextField(
-            value = key,
-            onValueChange = { key = it },
-            label = { Text(stringResource(R.string.onboarding_byok_key_label)) },
-            visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            modifier = Modifier.testTag("onboarding-byok-key"),
-        )
-        Button(
-            onClick = { onTest(provider, key) },
-            enabled = !isLoading && key.isNotBlank(),
-            modifier = Modifier.testTag("onboarding-btn-test-byok"),
-        ) {
-            Text(stringResource(R.string.onboarding_btn_test_byok))
+        } else {
+            Text(
+                stringResource(R.string.onboarding_wakeword_model_steps),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            OutlinedTextField(
+                value = key,
+                onValueChange = { key = it },
+                label = { Text(stringResource(R.string.onboarding_wakeword_accesskey_label)) },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.testTag("onboarding-wakeword-accesskey"),
+            )
+            accessKeyMasked?.let {
+                Text(
+                    stringResource(R.string.onboarding_wakeword_accesskey_set, it),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+            Button(
+                onClick = { onAccessKeySet(key, present) },
+                enabled = key.isNotBlank(),
+                modifier = Modifier.testTag("onboarding-btn-save-accesskey"),
+            ) {
+                Text(stringResource(R.string.onboarding_btn_save))
+            }
+            Button(
+                onClick = onContinue,
+                enabled = accessKeyMasked != null,
+                modifier = Modifier.testTag("onboarding-btn-continue"),
+            ) {
+                Text(stringResource(R.string.onboarding_btn_continue))
+            }
         }
     }
 }

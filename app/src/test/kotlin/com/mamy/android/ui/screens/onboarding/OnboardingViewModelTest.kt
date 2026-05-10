@@ -27,14 +27,11 @@ import org.junit.jupiter.api.Test
 /**
  * Unit tests for [OnboardingViewModel].
  *
- * Verifies:
- * - initial state is Permissions step
- * - linear next/back transitions across all 7 steps (incl. SMS step from P9)
- * - testByok success/failure paths
- * - connectCalendar success/failure/cancelled paths
- * - testWakeWord success/failure paths
- * - skipCalendar / skipSms shortcuts
- * - SMS opt-in toggle (NEW from P9)
+ * V1.5 alpha removed the Byok step (default LLM provider is local Ollama, no
+ * API key required). The flow is now 6 steps: Permissions → WakeWordModel →
+ * Sms → Calendar → WakeWord → Done. testByok() is retained for the Settings
+ * screen so power users can still configure Claude/OpenAI/Gemini, but it no
+ * longer advances the onboarding step.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class OnboardingViewModelTest {
@@ -65,11 +62,10 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `next walks through all 7 steps in order`() = runTest {
+    fun `next walks through all 6 steps in order`() = runTest {
         val vm = newVm()
         val expected = listOf(
             OnboardingStep.WakeWordModel,
-            OnboardingStep.Byok,
             OnboardingStep.Sms,
             OnboardingStep.Calendar,
             OnboardingStep.WakeWord,
@@ -100,11 +96,11 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `back from Sms returns to Byok`() = runTest {
+    fun `back from Sms returns to WakeWordModel`() = runTest {
         val vm = newVm()
-        repeat(3) { vm.next() } // Permissions → WakeWordModel → Byok → Sms
+        repeat(2) { vm.next() } // Permissions → WakeWordModel → Sms
         vm.back()
-        assertEquals(OnboardingStep.Byok, vm.state.value.step)
+        assertEquals(OnboardingStep.WakeWordModel, vm.state.value.step)
     }
 
     @Test
@@ -125,29 +121,37 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `testByok success advances to Sms and stores masked key`() = runTest {
+    fun `skipWakeWordModel jumps to Sms step`() = runTest {
+        val vm = newVm()
+        vm.next() // → WakeWordModel
+        vm.skipWakeWordModel()
+        assertEquals(OnboardingStep.Sms, vm.state.value.step)
+        assertNull(vm.state.value.errorMessage)
+    }
+
+    @Test
+    fun `testByok success records masked key without advancing step`() = runTest {
         coEvery { byok.testKey(OnboardingLlmProvider.Claude, "sk-ant-api03-xxxxxxxxxxxx") } returns
             flowOf(TestResult.Ok)
         val vm = newVm()
-        repeat(2) { vm.next() } // Permissions → WakeWordModel → Byok
+        vm.next() // → WakeWordModel (settings screen would call testByok from anywhere)
         vm.testByok(OnboardingLlmProvider.Claude, "sk-ant-api03-xxxxxxxxxxxx")
         val s = vm.state.value
-        assertEquals(OnboardingStep.Sms, s.step)
+        assertEquals(OnboardingStep.WakeWordModel, s.step) // not advanced
         assertEquals(OnboardingLlmProvider.Claude, s.byokProvider)
         assertNotNull(s.byokKeyMasked)
         assertNull(s.errorMessage)
     }
 
     @Test
-    fun `testByok failure stays on Byok step and surfaces error`() = runTest {
+    fun `testByok failure surfaces error and clears loading`() = runTest {
         coEvery { byok.testKey(OnboardingLlmProvider.OpenAi, "bad-key") } returns
             flowOf(TestResult.Failed("invalid_api_key"))
         val vm = newVm()
-        repeat(2) { vm.next() }
         vm.testByok(OnboardingLlmProvider.OpenAi, "bad-key")
         val s = vm.state.value
-        assertEquals(OnboardingStep.Byok, s.step)
         assertEquals("invalid_api_key", s.errorMessage)
+        assertFalse(s.isLoading)
     }
 
     @Test
@@ -162,7 +166,7 @@ class OnboardingViewModelTest {
     @Test
     fun `skipSms advances to Calendar without opt-in`() = runTest {
         val vm = newVm()
-        repeat(3) { vm.next() } // → Sms
+        repeat(2) { vm.next() } // → Sms
         vm.skipSms()
         val s = vm.state.value
         assertEquals(OnboardingStep.Calendar, s.step)
@@ -173,7 +177,7 @@ class OnboardingViewModelTest {
     fun `connectCalendar success advances to WakeWord`() = runTest {
         coEvery { calendar.connectGoogle() } returns flowOf(OAuthResult.Success("acc@x.com"))
         val vm = newVm()
-        repeat(4) { vm.next() } // → Calendar
+        repeat(3) { vm.next() } // → Calendar
         vm.connectCalendar()
         val s = vm.state.value
         assertEquals(OnboardingStep.WakeWord, s.step)
@@ -184,7 +188,7 @@ class OnboardingViewModelTest {
     fun `connectCalendar failure surfaces error and stays on Calendar`() = runTest {
         coEvery { calendar.connectGoogle() } returns flowOf(OAuthResult.Failure("network_down"))
         val vm = newVm()
-        repeat(4) { vm.next() }
+        repeat(3) { vm.next() }
         vm.connectCalendar()
         val s = vm.state.value
         assertEquals(OnboardingStep.Calendar, s.step)
@@ -195,7 +199,7 @@ class OnboardingViewModelTest {
     fun `connectCalendar cancelled clears loading without advancing`() = runTest {
         coEvery { calendar.connectGoogle() } returns flowOf(OAuthResult.Cancelled)
         val vm = newVm()
-        repeat(4) { vm.next() }
+        repeat(3) { vm.next() }
         vm.connectCalendar()
         val s = vm.state.value
         assertEquals(OnboardingStep.Calendar, s.step)
@@ -205,7 +209,7 @@ class OnboardingViewModelTest {
     @Test
     fun `skipCalendar advances to WakeWord`() = runTest {
         val vm = newVm()
-        repeat(4) { vm.next() }
+        repeat(3) { vm.next() }
         vm.skipCalendar()
         assertEquals(OnboardingStep.WakeWord, vm.state.value.step)
     }
@@ -214,7 +218,7 @@ class OnboardingViewModelTest {
     fun `testWakeWord success advances to Done`() = runTest {
         coEvery { wakeword.testFire() } returns flowOf(true)
         val vm = newVm()
-        repeat(5) { vm.next() } // → WakeWord
+        repeat(4) { vm.next() } // → WakeWord
         vm.testWakeWord()
         val s = vm.state.value
         assertEquals(OnboardingStep.Done, s.step)
@@ -225,7 +229,7 @@ class OnboardingViewModelTest {
     fun `testWakeWord failure stays on WakeWord with error`() = runTest {
         coEvery { wakeword.testFire() } returns flowOf(false)
         val vm = newVm()
-        repeat(5) { vm.next() }
+        repeat(4) { vm.next() }
         vm.testWakeWord()
         val s = vm.state.value
         assertEquals(OnboardingStep.WakeWord, s.step)
@@ -237,7 +241,7 @@ class OnboardingViewModelTest {
     fun `next clears errorMessage`() = runTest {
         coEvery { wakeword.testFire() } returns flowOf(false)
         val vm = newVm()
-        repeat(5) { vm.next() }
+        repeat(4) { vm.next() }
         vm.testWakeWord()
         assertNotNull(vm.state.value.errorMessage)
         vm.back()

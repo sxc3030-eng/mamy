@@ -5,17 +5,19 @@ import com.mamy.android.ui.onboarding.contracts.OnboardingLlmProvider
 /**
  * Onboarding flow steps, in order.
  *
- * Step 4 (Sms) is **NEW from P9** — opt-in for vocal SMS feature with
- * [READ_CONTACTS] + [SEND_SMS] permissions and a "Plus tard" skip option.
+ * V1.5 alpha removed the Byok step (default LLM is local Ollama via Cloudflare
+ * Tunnel — no API key required). BYOK power users configure Claude/OpenAI/Gemini
+ * later in Settings.
+ *
+ * Step 3 (Sms) is from P9 — opt-in vocal SMS with READ_CONTACTS + SEND_SMS.
  */
 enum class OnboardingStep {
     Permissions,   // Step 1 : RECORD_AUDIO + FOREGROUND_SERVICE_MICROPHONE + POST_NOTIFICATIONS
-    WakeWordModel, // Step 2 : Picovoice AccessKey + drop ppn files
-    Byok,          // Step 3 : BYOK provider + key
-    Sms,           // Step 4 : NEW P9 — opt-in SMS vocal (READ_CONTACTS + SEND_SMS)
-    Calendar,      // Step 5 : Google Calendar OAuth (optional)
-    WakeWord,      // Step 6 : test "MamY test 1 2 3"
-    Done,          // Step 7 : finish → ReportsList
+    WakeWordModel, // Step 2 : Picovoice AccessKey (or "use built-in JARVIS" skip)
+    Sms,           // Step 3 : opt-in SMS vocal (READ_CONTACTS + SEND_SMS)
+    Calendar,      // Step 4 : Google Calendar OAuth (optional)
+    WakeWord,      // Step 5 : test "Jarvis"
+    Done,          // Step 6 : finish → ReportsList
 }
 
 /**

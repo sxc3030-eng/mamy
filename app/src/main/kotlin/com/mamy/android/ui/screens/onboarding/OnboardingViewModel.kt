@@ -59,14 +59,18 @@ class OnboardingViewModel @Inject constructor(
         )
     }
 
-    /** Step 3 — validate BYOK key, advance on success. */
+    /**
+     * Power-user BYOK validation — no longer in the V1.5 onboarding flow but kept
+     * for the Settings screen so users can opt into Claude/OpenAI/Gemini later.
+     * On success, records the masked key and provider in state without advancing
+     * the step (Settings handles its own UI feedback).
+     */
     fun testByok(provider: OnboardingLlmProvider, key: String) = viewModelScope.launch {
         _state.update { it.copy(isLoading = true, errorMessage = null) }
         byok.testKey(provider, key).collectLatest { res ->
             _state.update { current ->
                 when (res) {
                     TestResult.Ok -> current.copy(
-                        step = OnboardingStep.Sms,
                         byokProvider = provider,
                         byokKeyMasked = mask(key),
                         isLoading = false,
@@ -78,6 +82,16 @@ class OnboardingViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Step 2 shortcut — V1.5 alpha builds bake a Picovoice AccessKey into
+     * BuildConfig and use the built-in `JARVIS` keyword, so the user does not
+     * have to drop a custom `.ppn` or paste a key. The screen calls this when
+     * it detects a baked-in key is present, jumping to the SMS step.
+     */
+    fun skipWakeWordModel() = _state.update {
+        it.copy(step = OnboardingStep.Sms, errorMessage = null)
     }
 
     /** Step 4 (NEW P9) — record SMS permissions + opt-in flag. */
@@ -145,8 +159,7 @@ class OnboardingViewModel @Inject constructor(
  */
 private fun OnboardingStep.next(): OnboardingStep = when (this) {
     OnboardingStep.Permissions -> OnboardingStep.WakeWordModel
-    OnboardingStep.WakeWordModel -> OnboardingStep.Byok
-    OnboardingStep.Byok -> OnboardingStep.Sms
+    OnboardingStep.WakeWordModel -> OnboardingStep.Sms
     OnboardingStep.Sms -> OnboardingStep.Calendar
     OnboardingStep.Calendar -> OnboardingStep.WakeWord
     OnboardingStep.WakeWord -> OnboardingStep.Done
@@ -159,8 +172,7 @@ private fun OnboardingStep.next(): OnboardingStep = when (this) {
 private fun OnboardingStep.previous(): OnboardingStep = when (this) {
     OnboardingStep.Permissions -> OnboardingStep.Permissions
     OnboardingStep.WakeWordModel -> OnboardingStep.Permissions
-    OnboardingStep.Byok -> OnboardingStep.WakeWordModel
-    OnboardingStep.Sms -> OnboardingStep.Byok
+    OnboardingStep.Sms -> OnboardingStep.WakeWordModel
     OnboardingStep.Calendar -> OnboardingStep.Sms
     OnboardingStep.WakeWord -> OnboardingStep.Calendar
     OnboardingStep.Done -> OnboardingStep.WakeWord
