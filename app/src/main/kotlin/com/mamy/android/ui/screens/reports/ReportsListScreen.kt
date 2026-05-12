@@ -41,6 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamy.android.R
 import com.mamy.android.service.MamYListenerService
+import com.mamy.android.ui.common.rememberSpeechToTextLauncher
 import java.time.Duration
 import java.time.Instant
 
@@ -57,6 +58,24 @@ fun ReportsListRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val today by todayViewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+
+    // Tap-to-record uses the system STT dialog (Gboard / Google STT / Samsung
+    // Voice) instead of the always-on Whisper+wake-word pipeline. The wake-word
+    // path (say "Jarvis") still triggers the ambient capture via the service —
+    // see MamYListenerService — but the FAB button is a quick "tap, dictate,
+    // done" UX that mirrors the Voice FAB on Notes and Actions. Once the user
+    // confirms in the system dialog we forward the transcript to the service
+    // for routing through the same StructuredCapturePipeline, so the resulting
+    // Note ends up structured (persons + actions + flags) just like a Whisper
+    // capture would.
+    val sttLauncher = rememberSpeechToTextLauncher { recognized ->
+        val intent = Intent(context, MamYListenerService::class.java).apply {
+            action = MamYListenerService.ACTION_PROCESS_TRANSCRIPT
+            putExtra(MamYListenerService.EXTRA_TRANSCRIPT, recognized)
+        }
+        context.startForegroundService(intent)
+    }
+
     ReportsListScreen(
         state = state,
         todayState = today,
@@ -64,18 +83,7 @@ fun ReportsListRoute(
         onQueryChange = viewModel::setQuery,
         onToggleHideUnmatched = viewModel::toggleHideUnmatched,
         onPersonClick = onPersonClick,
-        onRecord = {
-            val intent = Intent(context, MamYListenerService::class.java).apply {
-                action = MamYListenerService.ACTION_TRIGGER_CAPTURE
-            }
-            // startForegroundService is required from a foreground activity on Android 12+
-            context.startForegroundService(intent)
-            android.widget.Toast.makeText(
-                context,
-                context.getString(R.string.reports_record_toast_start),
-                android.widget.Toast.LENGTH_SHORT,
-            ).show()
-        },
+        onRecord = { sttLauncher.launch() },
     )
 }
 

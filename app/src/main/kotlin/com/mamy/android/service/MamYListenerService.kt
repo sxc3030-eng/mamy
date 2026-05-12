@@ -60,10 +60,36 @@ class MamYListenerService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_TRIGGER_CAPTURE) {
-            triggerCaptureNow()
+        when (intent?.action) {
+            ACTION_TRIGGER_CAPTURE -> triggerCaptureNow()
+            ACTION_PROCESS_TRANSCRIPT -> {
+                val transcript = intent.getStringExtra(EXTRA_TRANSCRIPT)?.trim().orEmpty()
+                if (transcript.isNotEmpty()) {
+                    processExternalTranscript(transcript)
+                }
+            }
         }
         return START_STICKY
+    }
+
+    /**
+     * Routes an already-transcribed string (e.g. from the system STT dialog
+     * fired by the Reports FAB) through the same structurer pipeline that the
+     * wake-word + Whisper path uses. Bypasses AudioCapture entirely — useful
+     * when the device's Whisper / AudioRecord setup is unreliable but the
+     * Google STT engine works fine.
+     */
+    private fun processExternalTranscript(transcript: String) {
+        scope.launch {
+            val preview = transcript.take(60).let { if (transcript.length > 60) "$it…" else it }
+            showToast(getString(R.string.capture_toast_saved, preview))
+            val lang = if (Locale.getDefault().language == "fr") Lang.FR else Lang.EN
+            runCatching { structurer.handle(transcript, lang, 0) }
+                .onFailure {
+                    Log.e(TAG, "external transcript structurer.handle failed", it)
+                    showToast(getString(R.string.capture_toast_structure_failed))
+                }
+        }
     }
 
     private fun startWakeWord() {
@@ -152,5 +178,7 @@ class MamYListenerService : Service() {
     companion object {
         private const val TAG = "MamYListenerService"
         const val ACTION_TRIGGER_CAPTURE = "com.mamy.android.action.TRIGGER_CAPTURE"
+        const val ACTION_PROCESS_TRANSCRIPT = "com.mamy.android.action.PROCESS_TRANSCRIPT"
+        const val EXTRA_TRANSCRIPT = "transcript"
     }
 }
