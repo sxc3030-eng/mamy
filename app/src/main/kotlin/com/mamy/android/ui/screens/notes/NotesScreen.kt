@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamy.android.R
 import com.mamy.android.ui.common.MicButton
+import com.mamy.android.ui.common.VoiceFab
 import com.mamy.android.ui.common.rememberSpeechToTextLauncher
 import java.time.Duration
 import java.time.Instant
@@ -48,6 +49,7 @@ fun NotesRoute(viewModel: NotesViewModel = hiltViewModel()) {
     NotesScreen(
         state = state,
         onAddNote = { title, body -> viewModel.addNote(title, body) },
+        onVoiceNote = { transcript -> viewModel.addNote("", transcript) },
         onSpeakNote = viewModel::speak,
     )
 }
@@ -57,6 +59,7 @@ fun NotesRoute(viewModel: NotesViewModel = hiltViewModel()) {
 fun NotesScreen(
     state: NotesUiState,
     onAddNote: (title: String, body: String) -> Unit = { _, _ -> },
+    onVoiceNote: (String) -> Unit = {},
     onSpeakNote: (java.util.UUID) -> Unit = {},
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -65,12 +68,22 @@ fun NotesScreen(
             TopAppBar(title = { Text(stringResource(R.string.notes_title)) })
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddDialog = true },
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.notes_btn_add)) },
-                modifier = Modifier.testTag("notes-fab-add"),
-            )
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                VoiceFab(
+                    onResult = onVoiceNote,
+                    contentDescription = stringResource(R.string.notes_btn_voice_cd),
+                    testTagName = "notes-fab-voice",
+                )
+                ExtendedFloatingActionButton(
+                    onClick = { showAddDialog = true },
+                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                    text = { Text(stringResource(R.string.notes_btn_add)) },
+                    modifier = Modifier.testTag("notes-fab-add"),
+                )
+            }
         },
         modifier = Modifier.testTag("notes-screen"),
     ) { padding ->

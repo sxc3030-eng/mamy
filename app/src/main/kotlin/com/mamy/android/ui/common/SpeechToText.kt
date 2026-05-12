@@ -5,9 +5,11 @@ import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -69,11 +71,7 @@ class SpeechToTextLauncher internal constructor(private val launch: () -> Unit) 
     fun launch() = launch.invoke()
 }
 
-/**
- * Standard "🎤" button to attach to a TextField row. Uses the `Email` icon as
- * a stand-in mic icon (material-icons-core has no Mic, and we don't ship
- * material-icons-extended yet). Replace with a vector drawable in V1.0.
- */
+/** Compact mic icon-button for trailing slot inside an OutlinedTextField. */
 @Composable
 fun MicButton(
     onClick: () -> Unit,
@@ -85,8 +83,34 @@ fun MicButton(
         modifier = modifier.testTag("mic-button"),
     ) {
         Icon(
-            imageVector = Icons.Filled.Email, // TODO V1.0 swap to Mic vector drawable
+            imageVector = Icons.Filled.Mic,
             contentDescription = stringResource(contentDescriptionRes),
+        )
+    }
+}
+
+/**
+ * Voice-first FAB — tap to dictate, the recognized string is delivered
+ * synchronously to [onResult]. Designed to sit above the secondary "Add"
+ * FAB on screens whose primary entry is voice (Notes, Actions, …).
+ */
+@Composable
+fun VoiceFab(
+    onResult: (String) -> Unit,
+    contentDescription: String,
+    testTagName: String,
+    modifier: Modifier = Modifier,
+) {
+    val launcher = rememberSpeechToTextLauncher(onResult)
+    FloatingActionButton(
+        onClick = { launcher.launch() },
+        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        modifier = modifier.testTag(testTagName),
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Mic,
+            contentDescription = contentDescription,
         )
     }
 }

@@ -85,6 +85,7 @@
     <string name="nav_settings">Settings</string>
     <string name="notes_title">Notes</string>
     <string name="notes_btn_add">New note</string>
+    <string name="notes_btn_voice_cd">Voice note — tap and dictate</string>
     <string name="notes_btn_save">Save</string>
     <string name="notes_btn_cancel">Cancel</string>
     <string name="notes_add_title">New note</string>
@@ -116,6 +117,7 @@
     <string name="calendar_empty_subtitle">Your next 30 days look clear. New meetings on your Google Calendar will appear here automatically after the next sync.</string>
     <string name="reports_record_label">Record</string>
     <string name="reports_record_cd">Tap to record a debrief</string>
+    <string name="reports_record_toast_start">Mamy listening… (up to 90s)</string>
     <string name="settings_provider_ollama_ready_title">Backend ready · no API key needed</string>
     <string name="settings_byok_test_loading">Testing %1$s connection…</string>
     <string name="settings_byok_test_ok">✓ %1$s connection OK</string>
@@ -137,6 +139,7 @@
     <string name="actions_empty_example_quote">“I told Marie I would send the spec by Friday”</string>
     <string name="actions_empty_example_result">→ Action: “Send spec to Marie” · due Friday · linked to Marie</string>
     <string name="actions_btn_add">Add</string>
+    <string name="actions_btn_voice_cd">Voice action — tap and dictate</string>
     <string name="actions_btn_add_confirm">Add</string>
     <string name="actions_btn_add_cancel">Cancel</string>
     <string name="actions_add_title">New action</string>

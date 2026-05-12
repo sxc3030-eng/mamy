@@ -63,10 +63,10 @@ _INSTALL_PAGE = """<!doctype html>
   @media (prefers-color-scheme:dark){.badge{background:#312e81;color:#c7d2fe}}
 </style>
 <h1>MamY — alpha</h1>
-<p><span class="badge">v0.4.4 · bottom nav + Notes tab + meeting reminders</span></p>
+<p><span class="badge">v0.4.5 · voice FAB Notes + Actions · Toast Record feedback</span></p>
 <p>Secrétaire vocale Android. 🎤 dicte tes notes/actions, 🔊 Mamy te les relit, agenda téléphone synchronisé, notifications 24h+1h avant chaque réunion.</p>
 
-<a class="btn" href="/dl/MamY-v0.4.4-alpha.apk">Télécharger l'APK</a>
+<a class="btn" href="/dl/MamY-v0.4.5-alpha.apk">Télécharger l'APK</a>
 
 <h3>Installation (3 minutes)</h3>
 <ol>

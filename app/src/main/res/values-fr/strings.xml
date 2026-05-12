@@ -85,6 +85,7 @@
     <string name="nav_settings">Réglages</string>
     <string name="notes_title">Notes</string>
     <string name="notes_btn_add">Nouvelle note</string>
+    <string name="notes_btn_voice_cd">Note vocale — appuie et dicte</string>
     <string name="notes_btn_save">Enregistrer</string>
     <string name="notes_btn_cancel">Annuler</string>
     <string name="notes_add_title">Nouvelle note</string>
@@ -116,6 +117,7 @@
     <string name="calendar_empty_subtitle">Tes 30 prochains jours sont libres. Les nouvelles réunions Google Calendar apparaîtront ici après la prochaine synchro.</string>
     <string name="reports_record_label">Enregistrer</string>
     <string name="reports_record_cd">Appuyer pour enregistrer un debrief</string>
+    <string name="reports_record_toast_start">Mamy écoute… (90s max)</string>
     <string name="settings_provider_ollama_ready_title">Backend prêt · aucune clé API requise</string>
     <string name="settings_byok_test_loading">Test connexion %1$s…</string>
     <string name="settings_byok_test_ok">✓ Connexion %1$s OK</string>
@@ -137,6 +139,7 @@
     <string name="actions_empty_example_quote">« J\'ai dit à Marie que j\'enverrais la spec d\'ici vendredi »</string>
     <string name="actions_empty_example_result">→ Action : « Envoyer spec à Marie » · échéance vendredi · liée à Marie</string>
     <string name="actions_btn_add">Ajouter</string>
+    <string name="actions_btn_voice_cd">Action vocale — appuie et dicte</string>
     <string name="actions_btn_add_confirm">Ajouter</string>
     <string name="actions_btn_add_cancel">Annuler</string>
     <string name="actions_add_title">Nouvelle action</string>

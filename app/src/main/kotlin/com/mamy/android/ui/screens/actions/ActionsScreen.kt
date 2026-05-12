@@ -52,6 +52,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mamy.android.R
 import com.mamy.android.ui.common.MicButton
+import com.mamy.android.ui.common.VoiceFab
 import com.mamy.android.ui.common.rememberSpeechToTextLauncher
 import java.time.Duration
 import java.time.Instant
@@ -69,6 +70,9 @@ fun ActionsRoute(viewModel: ActionsViewModel = hiltViewModel()) {
         onAddAction = { desc, assignee, deadline ->
             viewModel.addAction(desc, assignee, deadline)
         },
+        onVoiceAction = { transcript ->
+            viewModel.addAction(transcript, assignee = "Me", deadline = null)
+        },
         onSpeakAction = viewModel::speak,
     )
 }
@@ -80,6 +84,7 @@ fun ActionsScreen(
     onFilterChange: (ActionsFilter) -> Unit,
     onMarkDone: (UUID) -> Unit,
     onAddAction: (description: String, assignee: String, deadline: Instant?) -> Unit = { _, _, _ -> },
+    onVoiceAction: (String) -> Unit = {},
     onSpeakAction: (UUID) -> Unit = {},
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -88,12 +93,22 @@ fun ActionsScreen(
             TopAppBar(title = { Text(stringResource(R.string.actions_title)) })
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = { showAddDialog = true },
-                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text(stringResource(R.string.actions_btn_add)) },
-                modifier = Modifier.testTag("actions-fab-add"),
-            )
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                VoiceFab(
+                    onResult = onVoiceAction,
+                    contentDescription = stringResource(R.string.actions_btn_voice_cd),
+                    testTagName = "actions-fab-voice",
+                )
+                ExtendedFloatingActionButton(
+                    onClick = { showAddDialog = true },
+                    icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                    text = { Text(stringResource(R.string.actions_btn_add)) },
+                    modifier = Modifier.testTag("actions-fab-add"),
+                )
+            }
         },
     ) { padding ->
         if (showAddDialog) {

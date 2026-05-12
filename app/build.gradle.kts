@@ -41,8 +41,8 @@ android {
         applicationId = "com.mamy.android"
         minSdk = 28
         targetSdk = 35
-        versionCode = 15
-        versionName = "0.4.4-alpha"
+        versionCode = 16
+        versionName = "0.4.5-alpha"
 
         testInstrumentationRunner = "com.mamy.android.MamYTestRunner"
         vectorDrawables { useSupportLibrary = true }
@@ -156,6 +156,7 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.compose.navigation)
     debugImplementation(libs.compose.ui.tooling)
 

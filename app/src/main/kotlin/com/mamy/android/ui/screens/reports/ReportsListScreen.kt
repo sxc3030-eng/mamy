@@ -70,6 +70,11 @@ fun ReportsListRoute(
             }
             // startForegroundService is required from a foreground activity on Android 12+
             context.startForegroundService(intent)
+            android.widget.Toast.makeText(
+                context,
+                context.getString(R.string.reports_record_toast_start),
+                android.widget.Toast.LENGTH_SHORT,
+            ).show()
         },
     )
 }
