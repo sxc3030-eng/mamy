@@ -19,13 +19,13 @@
     <string name="service_notif_channel_name">Écoute MamY</string>
     <string name="service_notif_channel_desc">Notification permanente pendant l\'écoute du mot-clé.</string>
     <string name="service_notif_title">MamY écoute</string>
-    <string name="service_notif_text">Dis « MamY » pour capturer ou poser une question.</string>
+    <string name="service_notif_text">Dis « Jarvis » pour capturer ou poser une question.</string>
 
     <!-- Notification pipeline de capture (P2) -->
     <string name="mamy_listener_channel_name">Écoute MamY</string>
     <string name="mamy_listener_channel_desc">Écoute en continu du mot-clé</string>
     <string name="notif_title">MamY</string>
-    <string name="notif_idle">À l\'écoute de « MamY »</string>
+    <string name="notif_idle">À l\'écoute de « Jarvis »</string>
     <string name="notif_recording">Enregistrement…</string>
     <string name="notif_transcribing">Transcription…</string>
 
@@ -69,9 +69,9 @@
     <string name="notif_channel_daily">Briefing matinal</string>
     <string name="notif_channel_pre_meeting">Briefing pré-meeting</string>
     <string name="notif_daily_title">Briefing prêt</string>
-    <string name="notif_daily_body">Dis « MamY ma journée » pour l\'écouter.</string>
+    <string name="notif_daily_body">Dis « Jarvis ma journée » pour l\'écouter.</string>
     <string name="notif_pre_title">5 min avant {title}</string>
-    <string name="notif_pre_body">Touche pour écouter, ou dis « MamY briefe ».</string>
+    <string name="notif_pre_body">Touche pour écouter, ou dis « Jarvis briefe ».</string>
 
     <!-- Onboarding (P7 multi-step) -->
     <string name="onboarding_title">Bienvenue dans MamY</string>
@@ -118,6 +118,11 @@
     <string name="reports_record_label">Enregistrer</string>
     <string name="reports_record_cd">Appuyer pour enregistrer un debrief</string>
     <string name="reports_record_toast_start">Mamy écoute… (90s max)</string>
+    <string name="capture_toast_saved">Mamy a noté : %1$s</string>
+    <string name="capture_toast_no_speech">Je n\'ai rien entendu — réessaie, plus proche du micro.</string>
+    <string name="capture_toast_max_duration">90s atteint, je transcris…</string>
+    <string name="capture_toast_error">Erreur de capture — vois Réglages > Logs.</string>
+    <string name="capture_toast_structure_failed">Mamy t\'a entendu mais n\'a pas pu structurer — vérifie le tunnel / réseau.</string>
     <string name="settings_provider_ollama_ready_title">Backend prêt · aucune clé API requise</string>
     <string name="settings_byok_test_loading">Test connexion %1$s…</string>
     <string name="settings_byok_test_ok">✓ Connexion %1$s OK</string>
@@ -125,9 +130,9 @@
     <string name="reports_empty_title">Aucun rapport pour l\'instant</string>
     <string name="reports_empty_subtitle">Appuie sur le bouton « Enregistrer » et raconte ta journée à MamY. Les notes structurées apparaîtront ici.</string>
     <string name="reports_empty_examples_title">Essaie de dire :</string>
-    <string name="reports_empty_example_1">« MamY note à propos de Jimmy : il est stressé par l\'échéance du projet »</string>
-    <string name="reports_empty_example_2">« MamY action : rappeler Marie demain à 10h »</string>
-    <string name="reports_empty_example_3">« MamY flag : conflit entre Paul et l\'équipe design »</string>
+    <string name="reports_empty_example_1">« Jarvis note à propos de Jimmy : il est stressé par l\'échéance du projet »</string>
+    <string name="reports_empty_example_2">« Jarvis action : rappeler Marie demain à 10h »</string>
+    <string name="reports_empty_example_3">« Jarvis flag : conflit entre Paul et l\'équipe design »</string>
     <string name="reports_empty_footer">Backend : Ollama via tunnel cloud · Aucune clé API requise</string>
     <string name="reports_today_title">Aujourd\'hui · %1$d réunion(s)</string>
     <string name="reports_today_more">+ %1$d autres — voir Agenda</string>

@@ -8,14 +8,20 @@ import kotlin.math.sqrt
 
 /**
  * Consumes a [Flow] of PCM frames and applies VAD :
- *   - waits for first speech frame (otherwise NoSpeech after 5 s)
- *   - then accumulates until 1.5 s of trailing silence
+ *   - waits for first speech frame (otherwise NoSpeech after 8 s)
+ *   - then accumulates until 3.5 s of trailing silence
  *   - hard cap at 90 s
  *
+ * The 3.5 s trailing-silence threshold (was 1.5 s in v0.4.4) accommodates natural
+ * thinking pauses mid-debrief — a manager reflecting between sentences should
+ * not have the capture cut off after a brief hesitation. The 8 s no-speech
+ * abort (was 5 s) gives the user time to mentally compose after tapping the
+ * Record FAB.
+ *
  * Uses a simple RMS-energy detector (no external lib). Good enough for our wedge :
- * detect "user stopped speaking after 1.5 s of silence". WebRTC VAD would give better
- * voice/noise classification but the energy threshold is sufficient for desk + corridor
- * recordings. Threshold is tunable via [SimpleEnergyVad.rmsThreshold].
+ * detect "user stopped speaking after a few s of silence". WebRTC VAD would give
+ * better voice/noise classification but the energy threshold is sufficient for
+ * desk + corridor recordings. Threshold is tunable via [SimpleEnergyVad.rmsThreshold].
  */
 @Singleton
 class VadProcessor @Inject constructor() {
@@ -87,8 +93,8 @@ class VadProcessor @Inject constructor() {
     private fun createEnergyVad(): SimpleVad = SimpleEnergyVad()
 
     private companion object {
-        const val SILENCE_CUT_MS = 1500
-        const val NO_SPEECH_ABORT_MS = 5000
+        const val SILENCE_CUT_MS = 3500
+        const val NO_SPEECH_ABORT_MS = 8000
     }
 }
 

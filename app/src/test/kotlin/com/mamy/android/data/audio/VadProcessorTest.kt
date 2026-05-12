@@ -24,9 +24,10 @@ class VadProcessorTest {
     }
 
     @Test
-    fun `cuts after 50 frames of trailing silence post-speech`() = runTest {
-        // 10 speech frames, then 50 silence frames → Captured
-        val decisions = List(10) { true } + List(50) { false }
+    fun `cuts after 3 dot 5 s of trailing silence post-speech`() = runTest {
+        // v0.4.6 bumped SILENCE_CUT_MS from 1500 to 3500 → 3500/30 ≈ 117 frames.
+        // 10 speech frames, then 120 silence frames → Captured.
+        val decisions = List(10) { true } + List(120) { false }
         val proc = buildProcessor(decisions)
         val source = flow { repeat(decisions.size) { emit(frame()) } }
 
@@ -38,9 +39,9 @@ class VadProcessorTest {
     }
 
     @Test
-    fun `aborts NoSpeech after 5s of pure silence`() = runTest {
-        // 200 silence frames > 5000 ms / 30 ms = 167 threshold
-        val decisions = List(200) { false }
+    fun `aborts NoSpeech after 8 s of pure silence`() = runTest {
+        // v0.4.6 bumped NO_SPEECH_ABORT_MS from 5000 to 8000 → 8000/30 ≈ 267 frames.
+        val decisions = List(300) { false }
         val proc = buildProcessor(decisions)
         val source = flow { repeat(decisions.size) { emit(frame()) } }
 

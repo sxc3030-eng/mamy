@@ -41,8 +41,8 @@ android {
         applicationId = "com.mamy.android"
         minSdk = 28
         targetSdk = 35
-        versionCode = 16
-        versionName = "0.4.5-alpha"
+        versionCode = 17
+        versionName = "0.4.6-alpha"
 
         testInstrumentationRunner = "com.mamy.android.MamYTestRunner"
         vectorDrawables { useSupportLibrary = true }
