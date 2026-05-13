@@ -87,11 +87,14 @@ class ReportsListViewModelTest {
     }
 
     @Test
-    fun `default hideUnmatched is true`() = runTest {
+    fun `default hideUnmatched is false`() = runTest {
+        // v0.4.8 flipped the default: freshly-extracted persons from a debrief
+        // are marked unmatched=true until linked to a Contacts entry, and
+        // hiding them by default made Master's first captures invisible.
         val vm = ReportsListViewModel(repo)
         activate(vm)
         advanceUntilIdle()
-        assertTrue(vm.state.value.hideUnmatched)
+        assertFalse(vm.state.value.hideUnmatched)
     }
 
     @Test
@@ -157,12 +160,12 @@ class ReportsListViewModelTest {
         val vm = ReportsListViewModel(repo)
         activate(vm)
         advanceUntilIdle()
-        assertTrue(vm.state.value.hideUnmatched)
-        vm.toggleHideUnmatched()
-        advanceUntilIdle()
         assertFalse(vm.state.value.hideUnmatched)
         vm.toggleHideUnmatched()
         advanceUntilIdle()
         assertTrue(vm.state.value.hideUnmatched)
+        vm.toggleHideUnmatched()
+        advanceUntilIdle()
+        assertFalse(vm.state.value.hideUnmatched)
     }
 }

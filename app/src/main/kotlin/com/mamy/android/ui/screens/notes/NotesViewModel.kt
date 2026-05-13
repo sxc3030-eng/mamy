@@ -23,15 +23,22 @@ import javax.inject.Inject
 /**
  * Drives the Notes tab.
  *
- * "Notes" here means free-form text notes the user types directly (NOT debrief
- * transcripts). They are stored as [NoteEntity] rows with `non_structured = true`
- * and `llm_provider = "manual"`, so they never run through the structurer
- * pipeline and never trigger LLM calls.
+ * "Notes" here shows ALL captures regardless of origin — manual text notes
+ * the user typed in the Add dialog AND voice debriefs structured through
+ * the Ollama tunnel from the Reports Record FAB and the Voice FAB. Master
+ * reported in v0.4.7 testing that recordings went through the structurer
+ * but never surfaced in any UI; the previous filter
+ * (`llmProvider=="manual" && nonStructured`) was the culprit.
  *
- * Title and checklist are encoded inside [NoteEntity.rawText] using a simple
- * convention so we don't need a schema migration:
+ * For manual notes, title and checklist are encoded inside
+ * [NoteEntity.rawText] using a simple convention so we don't need a schema
+ * migration:
  *   line 0:    "# <title>"        (optional)
  *   line 1+:   body text          (any markdown — checkbox lines `- [ ] ...`)
+ *
+ * Structured debrief notes use the full transcript as `rawText` (no title)
+ * and additionally populate `structuredJson` plus child rows in Action /
+ * Promise / Flag tables — those still surface in the Reports / Actions tabs.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -47,14 +54,13 @@ class NotesViewModel @Inject constructor(
             flow { emit(noteDao.getAll()) }
         }
         .map { all ->
-            // Show only manual notes (non-structured, llm_provider = "manual"),
-            // sorted newest first.
-            val manuals = all.filter {
-                it.llmProvider == "manual" && it.nonStructured
-            }.sortedByDescending { it.createdAt }
+            // Show every NoteEntity (manual + voice-debrief), sorted newest
+            // first. The previous filter dropped structured debriefs and
+            // left Master with an empty Notes tab after he recorded.
+            val sorted = all.sortedByDescending { it.createdAt }
             NotesUiState(
-                rows = manuals.map { e -> e.toRow() },
-                isEmpty = manuals.isEmpty(),
+                rows = sorted.map { e -> e.toRow() },
+                isEmpty = sorted.isEmpty(),
             )
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, NotesUiState())

@@ -29,7 +29,12 @@ class ReportsListViewModel @Inject constructor(
 
     private val sort = MutableStateFlow(ReportsSort.Recent)
     private val query = MutableStateFlow("")
-    private val hideUnmatched = MutableStateFlow(true)
+    // Default to showing every person, including the ones Ollama just
+    // extracted from a fresh debrief (which are marked `unmatched=true`
+    // until they are linked to a Contacts entry). Previous default of
+    // `true` hid Master's freshly-captured persons and gave the impression
+    // that recordings produced nothing.
+    private val hideUnmatched = MutableStateFlow(false)
 
     val state: StateFlow<ReportsListUiState> =
         combine(sort, query, hideUnmatched) { s, q, h -> Triple(s, q, h) }
