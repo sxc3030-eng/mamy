@@ -52,8 +52,18 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           mkdir -p keystore
-          echo "$KEYSTORE_BASE64" | base64 --decode > keystore/mamy-release.jks
+          # Strip whitespace/newlines that GitHub Actions secret UI can
+          # introduce when the base64 is pasted with line wraps. Without
+          # the tr step, the decoded .jks ends up truncated/corrupt and
+          # keytool reports "Tag number over 30 is not supported".
+          printf '%s' "$KEYSTORE_BASE64" | tr -d ' \t\n\r' | base64 --decode > keystore/mamy-release.jks
+          if [ ! -s keystore/mamy-release.jks ]; then
+            echo "::error::Keystore decode produced empty file"
+            exit 1
+          fi
           ls -la keystore/
+          echo "Keystore SHA-256:"
+          sha256sum keystore/mamy-release.jks
 
       - name: Create signing.properties
         env:
